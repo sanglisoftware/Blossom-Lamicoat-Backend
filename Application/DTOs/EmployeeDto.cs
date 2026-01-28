@@ -12,6 +12,9 @@ public class EmployeeDto
 
     public string Mobile { get; set; } = string.Empty;
 
+    public short? Type { get; set; }
+
+
     public int RoleId { get; set; }
 
     public string? Role { get; set; }

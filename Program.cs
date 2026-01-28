@@ -68,6 +68,9 @@ builder.Services.AddScoped<IGalleryRepository, GalleryRepository>();
 builder.Services.AddScoped<IGalleryService, GalleryService>();
 builder.Services.AddScoped<IEnquiryRepository, EnquiryRepository>();
 builder.Services.AddScoped<IEnquiryService, EnquiryService>();
+builder.Services.AddScoped<IChemicalRepository, ChemicalRepository>();
+builder.Services.AddScoped<IChemicalService, ChemicalService>();
+
 
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -140,6 +143,9 @@ app.MapShopEndpoints();
 app.MapGalleryFilterEndpoints();
 app.MapGalleryEndpoints();
 app.MapEnquiryEndpoints();
+app.MapChemicalEndpoints();
+
+
 
 app.MapGet(
     "/admin-data",

@@ -23,6 +23,8 @@ namespace Api.Infrastructure.Data
         public DbSet<Shop> Shop { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
         public DbSet<Enquiry> Enquiry { get; set; }
+        public DbSet<Chemical> Chemical { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -187,6 +189,7 @@ namespace Api.Infrastructure.Data
                 entity.Property(e => e.RoleId).HasColumnName("role_id");
                 entity.Property(e => e.Username).HasColumnName("username").HasMaxLength(50).IsRequired();
                 entity.Property(e => e.ActiveStatus).HasColumnName("active_status");
+                entity.Property(e => e.Type).HasColumnName("type");
             });
 
             // ---------------- MENU ----------------
@@ -257,6 +260,37 @@ namespace Api.Infrastructure.Data
 
                 // This column exists in DB but is ignored in Entity
                 entity.Ignore(e => e.EnquiryTakenBy);
+            });
+
+
+            modelBuilder.Entity<Chemical>(entity =>
+            {
+                entity.ToTable("m_chemical");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.Type)
+                      .HasColumnName("type")
+                      .HasMaxLength(100)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.Comment)
+                      .HasColumnName("comment")
+                      .HasMaxLength(500)
+                      .IsUnicode(false);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
             });
         }
     }

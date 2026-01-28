@@ -23,6 +23,8 @@ namespace Api
                 .ForMember(dest => dest.SubMenu, opt => opt.Ignore());
             CreateMap<ProductNutrition, NutritionDto>().ReverseMap();
             CreateMap<Enquiry, EnquiryResponseDto>().ReverseMap();
+            CreateMap<Chemical, ChemicalDto>().ReverseMap();
+
         }
     }
 }

@@ -59,6 +59,8 @@ public class EmployeeService(IEmployeeRepository _repository, IMapper _mapper, A
             MiddleName = emp.MiddleName,
             LastName = emp.LastName,
             Mobile = emp.Mobile,
+            Type = emp.Type,
+
             ActiveStatus = emp.ActiveStatus,
         };
     }

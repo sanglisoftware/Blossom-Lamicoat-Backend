@@ -52,6 +52,7 @@ public class EmployeeRepository(AppDbContext _context) : IEmployeeRepository
                 MiddleName = x.MiddleName,
                 LastName = x.LastName,
                 Mobile = x.Mobile,
+                Type = x.Type,
                 ActiveStatus = x.ActiveStatus,
                 RoleValue = x.Role == null ? null : x.Role.RoleValue, // Now accessible
                 Username = x.Username, // Add if searching
