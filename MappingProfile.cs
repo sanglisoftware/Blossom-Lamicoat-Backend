@@ -24,6 +24,14 @@ namespace Api
             CreateMap<ProductNutrition, NutritionDto>().ReverseMap();
             CreateMap<Enquiry, EnquiryResponseDto>().ReverseMap();
             CreateMap<Chemical, ChemicalDto>().ReverseMap();
+            CreateMap<Grade, GradeDto>().ReverseMap();
+            CreateMap<Colour, ColourDto>().ReverseMap();
+            CreateMap<Customer, CustomerDto>().ReverseMap();
+            CreateMap<Supplier, SupplierDto>().ReverseMap();
+
+
+
+
 
         }
     }

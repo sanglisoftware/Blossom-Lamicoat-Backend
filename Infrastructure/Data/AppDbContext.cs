@@ -24,6 +24,14 @@ namespace Api.Infrastructure.Data
         public DbSet<Gallery> Galleries { get; set; }
         public DbSet<Enquiry> Enquiry { get; set; }
         public DbSet<Chemical> Chemical { get; set; }
+        public DbSet<Grade> Grade { get; set; }
+        public DbSet<Colour> Colour { get; set; }
+        public DbSet<Customer> Customer { get; set; }
+        public DbSet<Supplier> Supplier { get; set; }
+
+
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -289,6 +297,128 @@ namespace Api.Infrastructure.Data
                       .IsUnicode(false);
 
                 entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+            modelBuilder.Entity<Grade>(entity =>
+            {
+                entity.ToTable("m_grade");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+            modelBuilder.Entity<Colour>(entity =>
+            {
+                entity.ToTable("m_colour");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+            modelBuilder.Entity<Customer>(entity =>
+            {
+                entity.ToTable("m_customer");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Address)
+                      .HasColumnName("address")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Mobile_No)
+                      .HasColumnName("mobile_no")
+                      .HasMaxLength(13)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Email)
+                      .HasColumnName("email")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+
+                     entity.Property(e => e.GST_No)
+                      .HasColumnName("gst_no")
+                      .HasMaxLength(15)
+                      .IsUnicode(true);
+
+                    entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+             modelBuilder.Entity<Supplier>(entity =>
+            {
+                entity.ToTable("m_supplier");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Address)
+                      .HasColumnName("address")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Mobile_No)
+                      .HasColumnName("mobile_no")
+                      .HasMaxLength(13)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Pan)
+                      .HasColumnName("pan")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+
+                     entity.Property(e => e.GST_No)
+                      .HasColumnName("gst_no")
+                      .HasMaxLength(15)
+                      .IsUnicode(true);
+
+                    entity.Property(e => e.IsActive)
                       .HasColumnName("is_active");
 
             });

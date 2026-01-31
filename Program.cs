@@ -70,8 +70,14 @@ builder.Services.AddScoped<IEnquiryRepository, EnquiryRepository>();
 builder.Services.AddScoped<IEnquiryService, EnquiryService>();
 builder.Services.AddScoped<IChemicalRepository, ChemicalRepository>();
 builder.Services.AddScoped<IChemicalService, ChemicalService>();
-
-
+builder.Services.AddScoped<IGradeRepository, GradeRepository>();
+builder.Services.AddScoped<IGradeService, GradeService>();
+builder.Services.AddScoped<IColourRepository, ColourRepository>();
+builder.Services.AddScoped<IColourService, ColourService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddAuthentication("Bearer")
@@ -144,6 +150,14 @@ app.MapGalleryFilterEndpoints();
 app.MapGalleryEndpoints();
 app.MapEnquiryEndpoints();
 app.MapChemicalEndpoints();
+app.MapGradeEndpoints();
+app.MapColourEndpoints();
+app.MapCustomerEndpoints();
+app.MapSupplierEndpoints();
+
+
+
+
 
 
 
