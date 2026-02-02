@@ -28,6 +28,12 @@ namespace Api.Infrastructure.Data
         public DbSet<Colour> Colour { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Supplier> Supplier { get; set; }
+        public DbSet<Gramage> Gramage { get; set; }
+        public DbSet<Width> Width { get; set; }
+        public DbSet<PVCproductList> PVCproductList { get; set; }
+
+
+
 
 
 
@@ -422,6 +428,89 @@ namespace Api.Infrastructure.Data
                       .HasColumnName("is_active");
 
             });
+
+              modelBuilder.Entity<Gramage>(entity =>
+            {
+                entity.ToTable("m_gramage");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.GRM)
+                      .HasColumnName("grm")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+              modelBuilder.Entity<Width>(entity =>
+            {
+                entity.ToTable("m_width");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.GRM)
+                      .HasColumnName("grm")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+              modelBuilder.Entity<PVCproductList>(entity =>
+            {
+                entity.ToTable("m_pvcproducttable");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Gramage)
+                      .HasColumnName("gramage")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Width)
+                      .HasColumnName("width")
+                      .HasMaxLength(13)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.Colour)
+                      .HasColumnName("colour")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+
+                     entity.Property(e => e.Comments)
+                      .HasColumnName("comments")
+                      .HasMaxLength(15)
+                      .IsUnicode(true);
+
+                    entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+
         }
     }
 }

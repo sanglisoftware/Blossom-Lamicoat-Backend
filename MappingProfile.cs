@@ -28,6 +28,11 @@ namespace Api
             CreateMap<Colour, ColourDto>().ReverseMap();
             CreateMap<Customer, CustomerDto>().ReverseMap();
             CreateMap<Supplier, SupplierDto>().ReverseMap();
+            CreateMap<Gramage, GramageDto>().ReverseMap();
+            CreateMap<Width, WidthDto>().ReverseMap();
+            CreateMap<PVCproductList, PVCproductListDto>().ReverseMap();
+
+
 
 
 
