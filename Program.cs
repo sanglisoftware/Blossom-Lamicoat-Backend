@@ -88,6 +88,11 @@ builder.Services.AddScoped<IFGramageRepository, FGramageRepository>();
 builder.Services.AddScoped<IFGramageService, FGramageService>();
 builder.Services.AddScoped<IFproductListRepository, FproductListRepository>();
 builder.Services.AddScoped<IFproductListService, FproductListService>();
+builder.Services.AddScoped<IQualityRepository, QualityRepository>();
+builder.Services.AddScoped<IQualityService, QualityService>();
+builder.Services.AddScoped<IGSMRepository, GSMRepository>();
+builder.Services.AddScoped<IGSMService, GSMService>();
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddAuthentication("Bearer")
@@ -169,6 +174,9 @@ app.MapWidthEndpoints();
 app.MapPVCproductListEndpoints();
 app.MapFGramageEndpoints();
 app.MapFproductListEndpoints();
+app.MapQualityEndpoints();
+app.MapGSMEndpoints();
+
 
 
 

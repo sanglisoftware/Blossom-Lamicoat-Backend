@@ -33,6 +33,9 @@ namespace Api
             CreateMap<PVCproductList, PVCproductListDto>().ReverseMap();
             CreateMap<FGramage, FGramageDto>().ReverseMap();
             CreateMap<FproductList, FproductListDto>().ReverseMap();
+            CreateMap<Quality, QualityDto>().ReverseMap();
+            CreateMap<GSM, GSMDto>().ReverseMap();
+
 
 
 
