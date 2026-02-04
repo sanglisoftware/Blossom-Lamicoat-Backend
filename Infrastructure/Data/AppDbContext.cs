@@ -31,7 +31,9 @@ namespace Api.Infrastructure.Data
         public DbSet<Gramage> Gramage { get; set; }
         public DbSet<Width> Width { get; set; }
         public DbSet<PVCproductList> PVCproductList { get; set; }
-
+        public DbSet<FGramage> FGramage { get; set; }
+        public DbSet<FproductList> FproductList { get; set; }
+        
 
 
 
@@ -510,7 +512,62 @@ namespace Api.Infrastructure.Data
 
             });
 
+             modelBuilder.Entity<FGramage>(entity =>
+            {
+                entity.ToTable("m_fgramage");
 
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.GRM)
+                      .HasColumnName("grm")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
+
+              modelBuilder.Entity<FproductList>(entity =>
+            {
+                entity.ToTable("m_fproductlist");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .UseIdentityColumn();
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(200)
+                      .IsUnicode(true);
+
+                       entity.Property(e => e.GRM)
+                      .HasColumnName("grm")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+
+                       entity.Property(e => e.Colour)
+                      .HasColumnName("colour")
+                      .HasMaxLength(255)
+                      .IsUnicode(true);
+
+
+                     entity.Property(e => e.Comments)
+                      .HasColumnName("comments")
+                      .HasMaxLength(15)
+                      .IsUnicode(true);
+
+                    entity.Property(e => e.IsActive)
+                      .HasColumnName("is_active");
+
+            });
         }
     }
 }

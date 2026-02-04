@@ -84,7 +84,10 @@ builder.Services.AddScoped<IWidthRepository, WidthRepository>();
 builder.Services.AddScoped<IWidthService, WidthService>();
 builder.Services.AddScoped<IPVCproductListRepository, PVCproductListRepository>();
 builder.Services.AddScoped<IPVCproductListService, PVCproductListService>();
-
+builder.Services.AddScoped<IFGramageRepository, FGramageRepository>();
+builder.Services.AddScoped<IFGramageService, FGramageService>();
+builder.Services.AddScoped<IFproductListRepository, FproductListRepository>();
+builder.Services.AddScoped<IFproductListService, FproductListService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddAuthentication("Bearer")
@@ -164,6 +167,9 @@ app.MapSupplierEndpoints();
 app.MapGramageEndpoints();
 app.MapWidthEndpoints();
 app.MapPVCproductListEndpoints();
+app.MapFGramageEndpoints();
+app.MapFproductListEndpoints();
+
 
 
 
