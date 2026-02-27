@@ -12,35 +12,55 @@ public class FGramageService(IFGramageRepository _repository, IMapper _mapper, A
 {
     private static readonly string[] _excludedSearchProperties = ["IsActive", "Id", "SrNo",];
 
-    public async Task<PagedResultDto<FGramageDto>> GetAllAsync(PagedQueryDto query)
+  public async Task<PagedResultDto<FGramageDto>> GetAllAsync(PagedQueryDto query)
+{
+    var q = _repository.Query();
+
+    // 🔥 SAFE NULL CHECKS
+    if (query.filter != null && query.filter.Any(f =>
+        f.Type != null &&
+        f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)))
     {
-        var q = _repository.Query();
+        var searchTerms = query.filter
+            .Where(f => f.Type != null &&
+                        f.Type.Equals("like", StringComparison.OrdinalIgnoreCase))
+            .Select(f => f.Value)
+            .ToList();
 
-        // Apply global search
-        if (query.filter.Any(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)))
-        {
-            var searchTerms = query.filter.Where(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)).Select(f => f.Value).ToList();
-
-            q = q.Where(SearchHelper.BuildGlobalSearchPredicate<FGramage>(searchTerms, _excludedSearchProperties));
-        }
-
-        var total = await q.CountAsync();
-
-        // Apply sorting
-        q = SortHelper.ApplySorting(q, query.sort, s => s.Field, s => s.Dir) ?? q.OrderByDescending(n => n.Id);
-
-        // Pagination
-        var skip = (query.page - 1) * query.size;
-        var items = await q.Skip(skip).Take(query.size).ToListAsync();
-
-        return new PagedResultDto<FGramageDto>
-        {
-            Items = items.Select(_mapper.Map<FGramageDto>),
-            TotalCount = total,
-            Page = query.page,
-            Size = query.size,
-        };
+        q = q.Where(SearchHelper.BuildGlobalSearchPredicate<FGramage>(
+            searchTerms,
+            _excludedSearchProperties));
     }
+
+    var total = await q.CountAsync();
+
+    // SAFE SORTING
+    if (query.sort != null && query.sort.Any())
+    {
+        q = SortHelper.ApplySorting(q, query.sort, s => s.Field, s => s.Dir)
+            ?? q.OrderByDescending(n => n.Id);
+    }
+    else
+    {
+        q = q.OrderByDescending(n => n.Id);
+    }
+
+    // SAFE PAGINATION
+    var page = query.page <= 0 ? 1 : query.page;
+    var size = query.size <= 0 ? 10 : query.size;
+
+    var skip = (page - 1) * size;
+
+    var items = await q.Skip(skip).Take(size).ToListAsync();
+
+    return new PagedResultDto<FGramageDto>
+    {
+        Items = items.Select(_mapper.Map<FGramageDto>),
+        TotalCount = total,
+        Page = page,
+        Size = size,
+    };
+}
 
     public async Task<FGramageDto?> GetByIdAsync(int id)
     {

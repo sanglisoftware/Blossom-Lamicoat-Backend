@@ -4,53 +4,74 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Infrastructure.Repositories;
 
-public class QualityRepository(AppDbContext _context) : IQualityRepository
+public class QualityRepository
+    : IQualityRepository
 {
-    public async Task<IEnumerable<Quality>> GetAllAsync() => await _context.Quality.ToListAsync();
+    private readonly AppDbContext _context;
 
-    public async Task<Quality?> GetByIdAsync(int id) => await _context.Quality.FindAsync(id);
-
-    public async Task<Quality> AddAsync(Quality quality)
+    public QualityRepository(AppDbContext context)
     {
-        await _context.Quality.AddAsync(quality);
-        return quality;
+        _context = context;
     }
 
-    public async Task<Quality?> UpdateAsync(int id, Quality quality)
+    public IQueryable<Quality> Query()
     {
-        var existing = await _context.Quality.FindAsync(id);
-        if (existing == null) return null;
+        return _context.Quality
+            .Include(x => x.Colour)
+            .Include(x => x.GSM);
 
-        _context.Entry(existing).CurrentValues.SetValues(quality);
+               
+    }
+
+    public async Task<Quality?> GetByIdAsync(int id)
+    {
+        return await _context.Quality
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<Quality> AddAsync(
+        Quality entity)
+    {
+        await _context.Quality.AddAsync(entity);
         await _context.SaveChangesAsync();
+        return entity;
+    }
+
+    public async Task<Quality?> UpdateAsync(
+        int id,
+        Quality entity)
+    {
+        var existing = await _context.Quality
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
+            return null;
+
+        _context.Entry(existing).CurrentValues.SetValues(entity);
+
         return existing;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var quality = await _context.Quality.FindAsync(id);
-        if (quality == null)
+        var existing = await _context.Quality
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
             return false;
 
-        _context.Quality.Remove(quality);
+        _context.Quality.Remove(existing);
+
         await _context.SaveChangesAsync();
+
         return true;
     }
 
-    public async Task<Quality?> GetByNameAsync(string name)
+    public async Task<IEnumerable<Quality>> GetAllAsync()
     {
-        return await _context.Quality.FirstOrDefaultAsync(e => e.Name == name);
+        return await _context.Quality
+            .Include(x => x.Colour)
+            .Include(x => x.GSM)
+            .ToListAsync();
     }
-
-    public IQueryable<Quality> Query() =>
-        _context.Quality
-            .Select(x => new Quality
-            {
-                Id = x.Id, // Add if needed
-                Name = x.Name,
-                Comments = x.Comments,
-                GSM_GLM = x.GSM_GLM,
-                Colour = x.Colour,
-                IsActive = x.IsActive,
-            });
 }

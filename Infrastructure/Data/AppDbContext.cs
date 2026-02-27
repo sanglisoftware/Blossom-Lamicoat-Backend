@@ -35,13 +35,13 @@ namespace Api.Infrastructure.Data
         public DbSet<FproductList> FproductList { get; set; }
         public DbSet<Quality> Quality { get; set; }
         public DbSet<GSM> GSM { get; set; }
+        public DbSet<FinalProduct> FinalProduct { get; set; }
+        public DbSet<FormulaMaster> FormulaMaster { get; set; }
+        public DbSet<FormulaChemicalTransaction> FormulaChemicalTransaction { get; set; }
 
-        
-
-
-
-
-
+        public DbSet<ChemicalInward> ChemicalInward { get; set; }
+        public DbSet<PVCInward> PVCInward { get; set; }
+        public DbSet<FabricInward> FabricInward { get; set; }
 
 
 
@@ -116,10 +116,11 @@ namespace Api.Infrastructure.Data
                 entity.Property(e => e.SequenceNo).HasColumnName("sequence_no");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
-                entity.HasOne(e => e.GalleryFilter)
-                      .WithMany()
-                      .HasForeignKey(e => e.FilterId)
-                      .HasConstraintName("FK_Gallery_Filter");
+                entity
+                    .HasOne(e => e.GalleryFilter)
+                    .WithMany()
+                    .HasForeignKey(e => e.FilterId)
+                    .HasConstraintName("FK_Gallery_Filter");
             });
 
             // ---------------- SLIDER ----------------
@@ -186,13 +187,9 @@ namespace Api.Infrastructure.Data
                 entity.Property(e => e.Gst).HasColumnName("gst").HasColumnType("decimal(10,2)");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
-                entity.HasOne<Category>()
-                      .WithMany()
-                      .HasForeignKey(e => e.CategoryId);
+                entity.HasOne<Category>().WithMany().HasForeignKey(e => e.CategoryId);
 
-                entity.HasOne<Size>()
-                      .WithMany()
-                      .HasForeignKey(e => e.SizeId);
+                entity.HasOne<Size>().WithMany().HasForeignKey(e => e.SizeId);
             });
 
             // ---------------- EMPLOYEE ----------------
@@ -201,12 +198,28 @@ namespace Api.Infrastructure.Data
                 entity.ToTable("m_employee");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
-                entity.Property(e => e.FirstName).HasColumnName("first_name").HasMaxLength(50).IsRequired();
+                entity
+                    .Property(e => e.FirstName)
+                    .HasColumnName("first_name")
+                    .HasMaxLength(50)
+                    .IsRequired();
                 entity.Property(e => e.MiddleName).HasColumnName("middle_name").HasMaxLength(50);
-                entity.Property(e => e.LastName).HasColumnName("last_name").HasMaxLength(50).IsRequired();
-                entity.Property(e => e.Mobile).HasColumnName("mobile").HasMaxLength(15).IsRequired();
+                entity
+                    .Property(e => e.LastName)
+                    .HasColumnName("last_name")
+                    .HasMaxLength(50)
+                    .IsRequired();
+                entity
+                    .Property(e => e.Mobile)
+                    .HasColumnName("mobile")
+                    .HasMaxLength(15)
+                    .IsRequired();
                 entity.Property(e => e.RoleId).HasColumnName("role_id");
-                entity.Property(e => e.Username).HasColumnName("username").HasMaxLength(50).IsRequired();
+                entity
+                    .Property(e => e.Username)
+                    .HasColumnName("username")
+                    .HasMaxLength(50)
+                    .IsRequired();
                 entity.Property(e => e.ActiveStatus).HasColumnName("active_status");
                 entity.Property(e => e.Type).HasColumnName("type");
             });
@@ -231,9 +244,18 @@ namespace Api.Infrastructure.Data
                 entity.HasKey(e => new { e.RoleId, e.MenuId });
                 entity.Property(e => e.RoleId).HasColumnName("role_id");
                 entity.Property(e => e.MenuId).HasColumnName("menu_id");
-                entity.Property(e => e.CreatePermission).HasColumnName("create_permission").HasDefaultValue(false);
-                entity.Property(e => e.UpdatePermission).HasColumnName("update_permission").HasDefaultValue(false);
-                entity.Property(e => e.DeletePermission).HasColumnName("delete_permission").HasDefaultValue(false);
+                entity
+                    .Property(e => e.CreatePermission)
+                    .HasColumnName("create_permission")
+                    .HasDefaultValue(false);
+                entity
+                    .Property(e => e.UpdatePermission)
+                    .HasColumnName("update_permission")
+                    .HasDefaultValue(false);
+                entity
+                    .Property(e => e.DeletePermission)
+                    .HasColumnName("delete_permission")
+                    .HasDefaultValue(false);
             });
 
             modelBuilder.Entity<Enquiry>(entity =>
@@ -242,45 +264,41 @@ namespace Api.Infrastructure.Data
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("Name")
-                      .HasMaxLength(50)
-                      .IsUnicode(true);
+                entity.Property(e => e.Name).HasColumnName("Name").HasMaxLength(50).IsUnicode(true);
 
-                entity.Property(e => e.MobileNumber)
-                      .HasColumnName("MobileNumber")
-                      .HasMaxLength(13)
-                      .IsUnicode(false);
+                entity
+                    .Property(e => e.MobileNumber)
+                    .HasColumnName("MobileNumber")
+                    .HasMaxLength(13)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Product)
-                      .HasColumnName("Product")
-                      .HasMaxLength(20)
-                      .IsUnicode(false);
+                entity
+                    .Property(e => e.Product)
+                    .HasColumnName("Product")
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.PrimaryDiscussion)
-                      .HasColumnName("PrimaryDiscussion")
-                      .HasMaxLength(50)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.PrimaryDiscussion)
+                    .HasColumnName("PrimaryDiscussion")
+                    .HasMaxLength(50)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.status)
-                      .HasColumnName("status");
+                entity.Property(e => e.status).HasColumnName("status");
 
-                entity.Property(e => e.FollowupDate)
-                      .HasColumnName("FollowupDate");
+                entity.Property(e => e.FollowupDate).HasColumnName("FollowupDate");
 
-                entity.Property(e => e.FeedBack)
-                      .HasColumnName("FeedBack")
-                      .HasMaxLength(50)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.FeedBack)
+                    .HasColumnName("FeedBack")
+                    .HasMaxLength(50)
+                    .IsUnicode(true);
 
                 // This column exists in DB but is ignored in Entity
                 entity.Ignore(e => e.EnquiryTakenBy);
             });
-
 
             modelBuilder.Entity<Chemical>(entity =>
             {
@@ -288,28 +306,27 @@ namespace Api.Infrastructure.Data
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.Type)
-                      .HasColumnName("type")
-                      .HasMaxLength(100)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasMaxLength(100)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.Comment)
-                      .HasColumnName("comment")
-                      .HasMaxLength(500)
-                      .IsUnicode(false);
+                entity
+                    .Property(e => e.Comment)
+                    .HasColumnName("comment")
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
             modelBuilder.Entity<Grade>(entity =>
@@ -318,18 +335,15 @@ namespace Api.Infrastructure.Data
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
             modelBuilder.Entity<Colour>(entity =>
@@ -338,18 +352,15 @@ namespace Api.Infrastructure.Data
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -358,274 +369,404 @@ namespace Api.Infrastructure.Data
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Address)
-                      .HasColumnName("address")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Address)
+                    .HasColumnName("address")
+                    .HasMaxLength(255)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Mobile_No)
-                      .HasColumnName("mobile_no")
-                      .HasMaxLength(13)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Mobile_No)
+                    .HasColumnName("mobile_no")
+                    .HasMaxLength(13)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Email)
-                      .HasColumnName("email")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Email)
+                    .HasColumnName("email")
+                    .HasMaxLength(255)
+                    .IsUnicode(true);
 
+                entity
+                    .Property(e => e.GST_No)
+                    .HasColumnName("gst_no")
+                    .HasMaxLength(15)
+                    .IsUnicode(true);
 
-                     entity.Property(e => e.GST_No)
-                      .HasColumnName("gst_no")
-                      .HasMaxLength(15)
-                      .IsUnicode(true);
-
-                    entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-             modelBuilder.Entity<Supplier>(entity =>
+            modelBuilder.Entity<Supplier>(entity =>
             {
                 entity.ToTable("m_supplier");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Address)
-                      .HasColumnName("address")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Address)
+                    .HasColumnName("address")
+                    .HasMaxLength(255)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Mobile_No)
-                      .HasColumnName("mobile_no")
-                      .HasMaxLength(13)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Mobile_No)
+                    .HasColumnName("mobile_no")
+                    .HasMaxLength(13)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Pan)
-                      .HasColumnName("pan")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity.Property(e => e.Pan).HasColumnName("pan").HasMaxLength(255).IsUnicode(true);
 
+                entity
+                    .Property(e => e.GST_No)
+                    .HasColumnName("gst_no")
+                    .HasMaxLength(15)
+                    .IsUnicode(true);
 
-                     entity.Property(e => e.GST_No)
-                      .HasColumnName("gst_no")
-                      .HasMaxLength(15)
-                      .IsUnicode(true);
-
-                    entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-              modelBuilder.Entity<Gramage>(entity =>
+            modelBuilder.Entity<Gramage>(entity =>
             {
                 entity.ToTable("m_gramage");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.GRM)
-                      .HasColumnName("grm")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity.Property(e => e.GRM).HasColumnName("grm").HasMaxLength(200).IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-              modelBuilder.Entity<Width>(entity =>
+            modelBuilder.Entity<Width>(entity =>
             {
                 entity.ToTable("m_width");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.GRM)
-                      .HasColumnName("grm")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity.Property(e => e.GRM).HasColumnName("grm").HasMaxLength(200).IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-              modelBuilder.Entity<PVCproductList>(entity =>
+            modelBuilder.Entity<PVCproductList>(entity =>
             {
                 entity.ToTable("m_pvcproducttable");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.Gramage)
-                      .HasColumnName("gramage")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.GramageMasterId)
+                    .HasColumnName("gramage_master_id");
+                entity
+                    .Property(e => e.WidthMasterId)
+                    .HasColumnName("width_master_id");
 
-                       entity.Property(e => e.Width)
-                      .HasColumnName("width")
-                      .HasMaxLength(13)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.ColourMasterId)
+                    .HasColumnName("colour_master_id");
 
-                       entity.Property(e => e.Colour)
-                      .HasColumnName("colour")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Comments)
+                    .HasColumnName("comments")
+                    .HasMaxLength(15)
+                    .IsUnicode(true);
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
 
 
-                     entity.Property(e => e.Comments)
-                      .HasColumnName("comments")
-                      .HasMaxLength(15)
-                      .IsUnicode(true);
+                // Foreign Keys
 
-                    entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
+                entity.HasOne(e => e.Gramage).WithMany(s => s.PVCGramage).HasForeignKey(e => e.GramageMasterId);
+
+                entity.HasOne(e => e.Width).WithMany(s => s.PVCWidth).HasForeignKey(e => e.WidthMasterId);
+
+                entity.HasOne(e => e.Colour).WithMany(s => s.PVCColour).HasForeignKey(e => e.ColourMasterId);
 
             });
 
-             modelBuilder.Entity<FGramage>(entity =>
+            modelBuilder.Entity<FGramage>(entity =>
             {
                 entity.ToTable("m_fgramage");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.GRM)
-                      .HasColumnName("grm")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity.Property(e => e.GRM).HasColumnName("grm").HasMaxLength(200).IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
-
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
-              modelBuilder.Entity<FproductList>(entity =>
+            modelBuilder.Entity<FproductList>(entity =>
             {
                 entity.ToTable("m_fproductlist");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200);
 
-                       entity.Property(e => e.GRM)
-                      .HasColumnName("grm")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity.Property(e => e.FGramageMasterId).HasColumnName("fgramage_master_id");
+
+                entity
+                    .Property(e => e.ColourMasterId)
+                    .HasColumnName("colour_master_id");
+                  
+
+                entity
+                    .Property(e => e.Comments)
+                    .HasColumnName("comments")
+                    .HasMaxLength(15)
+                    .IsUnicode(true);
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
 
 
-                       entity.Property(e => e.Colour)
-                      .HasColumnName("colour")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity.HasOne(e => e.FGramage).WithMany(s => s.Fgrmage).HasForeignKey(e => e.FGramageMasterId);
 
 
-                     entity.Property(e => e.Comments)
-                      .HasColumnName("comments")
-                      .HasMaxLength(15)
-                      .IsUnicode(true);
-
-                    entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
+              entity.HasOne(e => e.Colour).WithMany(s => s.FColour).HasForeignKey(e => e.ColourMasterId);
 
             });
 
-              modelBuilder.Entity<Quality>(entity =>
+            modelBuilder.Entity<Quality>(entity =>
             {
                 entity.ToTable("m_quality");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                     entity.Property(e => e.Comments)
-                      .HasColumnName("comments")
-                      .HasMaxLength(15)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Comments)
+                    .HasColumnName("comments")
+                    .HasMaxLength(15)
+                    .IsUnicode(true);
 
-                       entity.Property(e => e.GSM_GLM)
-                      .HasColumnName("gsm/glm")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity.Property(e => e.GSMGLMMasterId) .HasColumnName("gsmglm_master_id");
 
-                      entity.Property(e => e.Colour)
-                      .HasColumnName("colour")
-                      .HasMaxLength(255)
-                      .IsUnicode(true);
+                entity.Property(e => e.ColourMasterId).HasColumnName("colour_master_id");
+                
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
 
-                    entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
+                   // Foreign Keys
 
+                entity.HasOne(e => e.GSM).WithMany(s => s.gsmquality).HasForeignKey(e => e.GSMGLMMasterId);
+
+                       entity.HasOne(e => e.Colour).WithMany(c => c.colourquality).HasForeignKey(e => e.ColourMasterId);
             });
 
-             modelBuilder.Entity<GSM>(entity =>
+            modelBuilder.Entity<GSM>(entity =>
             {
                 entity.ToTable("m_gsm");
 
                 entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.Id)
-                      .HasColumnName("id")
-                      .UseIdentityColumn();
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
 
-                entity.Property(e => e.Name)
-                      .HasColumnName("name")
-                      .HasMaxLength(200)
-                      .IsUnicode(true);
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
 
-                entity.Property(e => e.IsActive)
-                      .HasColumnName("is_active");
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+            });
+
+            modelBuilder.Entity<FinalProduct>(entity =>
+            {
+                entity.ToTable("m_final_product");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity
+                    .Property(e => e.Final_Product)
+                    .HasColumnName("final_product")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+            });
+
+            modelBuilder.Entity<FormulaMaster>(entity =>
+            {
+                entity.ToTable("m_formula_master");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity
+                    .Property(e => e.FinalProductId)
+                    .HasColumnName("final_product_id")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+            });
+
+            modelBuilder.Entity<FormulaChemicalTransaction>(entity =>
+            {
+                entity.ToTable("m_formula_chemical_transaction");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity.Property(e => e.FormulaMasterId).HasColumnName("formula_master_id");
+
+                entity.Property(e => e.ChemicalMasterId).HasColumnName("chemical_master_id");
+
+                entity.Property(e => e.Qty).HasColumnName("qty");
+
+                // Foreign Keys
+
+                entity.HasOne(e => e.FormulaMaster).WithMany(f => f.formulaChemicalTransactions).HasForeignKey(e => e.FormulaMasterId);
+
+                entity.HasOne(e => e.Chemical).WithMany(c => c.formulaChemicals).HasForeignKey(e => e.ChemicalMasterId);
+
+            });
+            
+
+            modelBuilder.Entity<ChemicalInward>(entity =>
+            {
+                entity.ToTable("m_chemical_inword");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity.Property(e => e.ChemicalMasterId).HasColumnName("chemical_master_id");
+
+                entity.Property(e => e.Qty).HasColumnName("qty");
+
+                entity.Property(e => e.SupplierMasterId).HasColumnName("supplier_master_id");
+
+                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+
+                entity.Property(e => e.BillDate).HasColumnName("bill_date");
+
+                entity.Property(e => e.ReceivedDate).HasColumnName("received_date");
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+
+                // Foreign Keys
+
+                entity.HasOne(e => e.Supplier).WithMany(s => s.supplierInwards).HasForeignKey(e => e.SupplierMasterId);
+
+                       entity.HasOne(e => e.Chemical).WithMany(c => c.chemicalInwards).HasForeignKey(e => e.ChemicalMasterId);
+
+            });
+
+
+
+              modelBuilder.Entity<PVCInward>(entity =>
+            {
+                entity.ToTable("m_pvc_inward");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity.Property(e => e.SupplierMasterId).HasColumnName("supplier_master_id");
+
+                entity.Property(e => e.PVCMasterId).HasColumnName("pvc_master_id");
+
+                entity.Property(e => e.New_RollNo).HasColumnName("new_rollno");
+
+                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+
+                entity.Property(e => e.Qty_kg).HasColumnName("qty_kg");
+
+                entity.Property(e => e.Qty_Mtr).HasColumnName("qty_mtr");
+
+                entity.Property(e => e.Comments).HasColumnName("comments");
+
+                entity.Property(e => e.BillDate).HasColumnName("bill_date");
+
+                entity.Property(e => e.ReceivedDate).HasColumnName("received_date");
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+                // Foreign Keys
+
+                entity.HasOne(e => e.Supplier).WithMany(s => s.supplierPVCInwards).HasForeignKey(e => e.SupplierMasterId);
+
+                entity.HasOne(e => e.PVC).WithMany(c => c.pvcInwards).HasForeignKey(e => e.PVCMasterId);
+
+            });
+
+
+             modelBuilder.Entity<FabricInward>(entity =>
+            {
+                entity.ToTable("m_fabric_inward");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity.Property(e => e.SupplierMasterId).HasColumnName("supplier_master_id");
+
+                entity.Property(e => e.FabricMasterId).HasColumnName("fabric_master_id");
+
+                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+
+                entity.Property(e => e.QtyMTR).HasColumnName("qty_mtr");
+
+                entity.Property(e => e.Comments).HasColumnName("comments");
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+                // Foreign Keys
+
+                entity.HasOne(e => e.Supplier).WithMany(s => s.supplierFInwards).HasForeignKey(e => e.SupplierMasterId);
+
+                entity.HasOne(e => e.Fabric).WithMany(c => c.fabricInwards).HasForeignKey(e => e.FabricMasterId);
 
             });
         }
+
+
+        
     }
 }

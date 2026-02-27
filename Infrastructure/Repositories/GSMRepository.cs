@@ -13,6 +13,7 @@ public class GSMRepository(AppDbContext _context) : IGSMRepository
     public async Task<GSM> AddAsync(GSM gsm)
     {
         await _context.GSM.AddAsync(gsm);
+        await _context.SaveChangesAsync();
         return gsm;
     }
 

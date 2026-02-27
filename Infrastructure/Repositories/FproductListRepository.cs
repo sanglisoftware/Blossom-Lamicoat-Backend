@@ -4,53 +4,71 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Infrastructure.Repositories;
 
-public class FproductListRepository(AppDbContext _context) : IFproductListRepository
+public class FproductListRepository
+    : IFproductListRepository
 {
-    public async Task<IEnumerable<FproductList>> GetAllAsync() => await _context.FproductList.ToListAsync();
+    private readonly AppDbContext _context;
 
-    public async Task<FproductList?> GetByIdAsync(int id) => await _context.FproductList.FindAsync(id);
-
-    public async Task<FproductList> AddAsync(FproductList fproductlist)
+    public FproductListRepository(AppDbContext context)
     {
-        await _context.FproductList.AddAsync(fproductlist);
-        return fproductlist;
+        _context = context;
     }
 
-    public async Task<FproductList?> UpdateAsync(int id, FproductList fproductlist)
+    public IQueryable<FproductList> Query()
     {
-        var existing = await _context.FproductList.FindAsync(id);
-        if (existing == null) return null;
+        return _context.FproductList
+            .Include(x => x.Colour)
+            .Include(x => x.FGramage);
 
-        _context.Entry(existing).CurrentValues.SetValues(fproductlist);
-        await _context.SaveChangesAsync();
+               
+    }
+
+    public async Task<FproductList?> GetByIdAsync(int id)
+    {
+        return await _context.FproductList
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<FproductList> AddAsync(
+        FproductList entity)
+    {
+        await _context.FproductList.AddAsync(entity);
+        return entity;
+    }
+
+    public async Task<FproductList?> UpdateAsync(
+        int id,
+        FproductList entity)
+    {
+        var existing = await _context.FproductList
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
+            return null;
+
+        _context.Entry(existing).CurrentValues.SetValues(entity);
+
         return existing;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var fproductlist = await _context.FproductList.FindAsync(id);
-        if (fproductlist == null)
+        var existing = await _context.FormulaChemicalTransaction
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
             return false;
 
-        _context.FproductList.Remove(fproductlist);
-        await _context.SaveChangesAsync();
+        _context.FormulaChemicalTransaction.Remove(existing);
+
         return true;
     }
 
-    public async Task<FproductList?> GetByNameAsync(string name)
+    public async Task<IEnumerable<FproductList>> GetAllAsync()
     {
-        return await _context.FproductList.FirstOrDefaultAsync(e => e.Name == name);
+        return await _context.FproductList
+            .Include(x => x.Colour)
+            .Include(x => x.FGramage)
+            .ToListAsync();
     }
-
-    public IQueryable<FproductList> Query() =>
-        _context.FproductList
-            .Select(x => new FproductList
-            {
-                Id = x.Id, // Add if needed
-                Name = x.Name,
-                GRM = x.GRM,
-                Colour = x.Colour,
-                Comments = x.Comments,
-                IsActive = x.IsActive,
-            });
 }

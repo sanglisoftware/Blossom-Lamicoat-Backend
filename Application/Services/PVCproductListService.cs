@@ -51,9 +51,9 @@ public class PVCproductListService(IPVCproductListRepository _repository, IMappe
         {
             Id = PVC.Id,
             Name = PVC.Name,
-            Gramage = PVC.Gramage,
-            Width = PVC.Width,
-            Colour = PVC.Colour,
+            GramageMasterId = PVC.GramageMasterId,
+            WidthMasterId = PVC.WidthMasterId,
+            ColourMasterId = PVC.ColourMasterId,
             Comments = PVC.Comments,
             IsActive = PVC.IsActive,
         };

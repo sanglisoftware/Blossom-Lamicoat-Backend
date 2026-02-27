@@ -4,54 +4,68 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Infrastructure.Repositories;
 
-public class PVCproductListRepository(AppDbContext _context) : IPVCproductListRepository
+public class PVCproductListRepository
+    : IPVCproductListRepository
 {
-    public async Task<IEnumerable<PVCproductList>> GetAllAsync() => await _context.PVCproductList.ToListAsync();
+    private readonly AppDbContext _context;
 
-    public async Task<PVCproductList?> GetByIdAsync(int id) => await _context.PVCproductList.FindAsync(id);
-
-    public async Task<PVCproductList> AddAsync(PVCproductList pvcproductlist)
+    public PVCproductListRepository(AppDbContext context)
     {
-        await _context.PVCproductList.AddAsync(pvcproductlist);
-        return pvcproductlist;
+        _context = context;
     }
 
-    public async Task<PVCproductList?> UpdateAsync(int id, PVCproductList pvcproductlist)
+    public IQueryable<PVCproductList> Query()
     {
-        var existing = await _context.PVCproductList.FindAsync(id);
-        if (existing == null) return null;
+        return _context.PVCproductList
+            .Include(x => x.Colour)
+            .Include(x => x.Gramage)
+            .Include(x => x.Width);
+               
+    }
 
-        _context.Entry(existing).CurrentValues.SetValues(pvcproductlist);
-        await _context.SaveChangesAsync();
+    public async Task<PVCproductList?> GetByIdAsync(int id)
+    {
+        return await _context.PVCproductList
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<PVCproductList> AddAsync(
+        PVCproductList entity)
+    {
+        await _context.PVCproductList.AddAsync(entity);
+        return entity;
+    }
+
+    public async Task<PVCproductList?> UpdateAsync(
+        int id,
+        PVCproductList entity)
+    {
+        var existing = await _context.PVCproductList
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
+            return null;
+
+        _context.Entry(existing).CurrentValues.SetValues(entity);
+
         return existing;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var pvcproductlist = await _context.PVCproductList.FindAsync(id);
-        if (pvcproductlist == null)
+        var existing = await _context.FormulaChemicalTransaction
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (existing == null)
             return false;
 
-        _context.PVCproductList.Remove(pvcproductlist);
-        await _context.SaveChangesAsync();
+        _context.FormulaChemicalTransaction.Remove(existing);
+
         return true;
     }
 
-    public async Task<PVCproductList?> GetByNameAsync(string name)
+    public Task<IEnumerable<PVCproductList>> GetAllAsync()
     {
-        return await _context.PVCproductList.FirstOrDefaultAsync(e => e.Name == name);
+        throw new NotImplementedException();
     }
-
-    public IQueryable<PVCproductList> Query() =>
-        _context.PVCproductList
-            .Select(x => new PVCproductList
-            {
-                Id = x.Id, // Add if needed
-                Name = x.Name,
-                Gramage = x.Gramage,
-                Width = x.Width,
-                Colour = x.Colour,
-                Comments = x.Comments,
-                IsActive = x.IsActive,
-            });
 }

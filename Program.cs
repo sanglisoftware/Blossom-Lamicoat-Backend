@@ -92,7 +92,18 @@ builder.Services.AddScoped<IQualityRepository, QualityRepository>();
 builder.Services.AddScoped<IQualityService, QualityService>();
 builder.Services.AddScoped<IGSMRepository, GSMRepository>();
 builder.Services.AddScoped<IGSMService, GSMService>();
-
+builder.Services.AddScoped<IFinalProductRepository, FinalProductRepository>();
+builder.Services.AddScoped<IFinalProductService, FinalProductService>();
+builder.Services.AddScoped<IFormulaMasterRepository, FormulaMasterRepository>();
+builder.Services.AddScoped<IFormulaMasterService, FormulaMasterService>();
+builder.Services.AddScoped<IFormulaChemicalTransactionRepository, FormulaChemicalTransactionRepository>();
+builder.Services.AddScoped<IFormulaChemicalTransactionService, FormulaChemicalTransactionService>();
+builder.Services.AddScoped<IChemicalInwardRepository, ChemicalInwardRepository>();
+builder.Services.AddScoped<IChemicalInwardService, ChemicalInwardService>();
+builder.Services.AddScoped<IPVCInwardRepository, PVCInwardRepository>();
+builder.Services.AddScoped<IPVCInwardService, PVCInwardService>();
+builder.Services.AddScoped<IFabricInwardRepository, FabricInwardRepository>();
+builder.Services.AddScoped<IFabricInwardService, FabricInwardService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddAuthentication("Bearer")
@@ -176,6 +187,14 @@ app.MapFGramageEndpoints();
 app.MapFproductListEndpoints();
 app.MapQualityEndpoints();
 app.MapGSMEndpoints();
+app.MapFinalProductEndpoints();
+app.MapFormulaMasterEndpoints();
+app.MapFormulaChemicalTransactionEndpoints();
+app.MapChemicalInwardEndpoints();
+app.MapPVCInwardEndpoints();
+app.MapFabricInwardEndpoints();
+
+
 
 
 

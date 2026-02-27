@@ -10,6 +10,16 @@ namespace Api.Domain.Entities
         public string Pan { get; set; }  = string.Empty;
         public string GST_No { get; set; }  = string.Empty;
         public short? IsActive { get; set; } 
+
+
+          public ICollection<ChemicalInward> supplierInwards
+        { get; set; } = new List<ChemicalInward>();    
+
+           public ICollection<PVCInward> supplierPVCInwards
+        { get; set; } = new List<PVCInward>();     
+
+         public ICollection<FabricInward> supplierFInwards
+        { get; set; } = new List<FabricInward>();    
         
     }
 }
