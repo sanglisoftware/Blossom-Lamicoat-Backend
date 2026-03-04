@@ -16,6 +16,7 @@ namespace Api
             CreateMap<Gallery, GalleryDto>().ReverseMap();
             CreateMap<Product, ProductDto>().ReverseMap();
             CreateMap<Employee, EmployeeDto>().ReverseMap();
+            CreateMap<Salary, SalaryDto>().ReverseMap();
             CreateMap<News, NewsCreateDto>().ReverseMap();
             CreateMap<Shop, ShopDto>().ReverseMap();
             CreateMap<Menu, MenuDto>()

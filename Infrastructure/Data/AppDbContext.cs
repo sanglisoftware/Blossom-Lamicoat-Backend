@@ -16,6 +16,7 @@ namespace Api.Infrastructure.Data
         public DbSet<GalleryFilter> GalleryFilters { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Salary> Salaries { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<RoleMenuPermission> RoleMenuPermissions { get; set; }
         public DbSet<News> News { get; set; }
@@ -222,6 +223,26 @@ namespace Api.Infrastructure.Data
                     .IsRequired();
                 entity.Property(e => e.ActiveStatus).HasColumnName("active_status");
                 entity.Property(e => e.Type).HasColumnName("type");
+            });
+
+            modelBuilder.Entity<Salary>(entity =>
+            {
+                entity.ToTable("m_salary");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.Type).HasColumnName("type");
+                entity.Property(e => e.Attendance).HasColumnName("attendance");
+                entity.Property(e => e.ExtraHours).HasColumnName("extra_hours").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.TotalLate).HasColumnName("total_late").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.HalfDay).HasColumnName("half_day").HasColumnType("decimal(10,2)");
+                entity.Property(e => e.TotalSalary).HasColumnName("total_salary").HasColumnType("decimal(18,2)");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity.HasOne(e => e.Employee)
+                    .WithMany()
+                    .HasForeignKey(e => e.EmployeeId)
+                    .HasConstraintName("FK_m_salary_m_employee");
             });
 
             // ---------------- MENU ----------------
