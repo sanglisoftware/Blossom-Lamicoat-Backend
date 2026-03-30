@@ -31,6 +31,7 @@ public class FormulaChemicalTransactionService(
                 ChemicalMasterId = x.ChemicalMasterId,
                 Qty = x.Qty,
                 FinalProductName = x.FormulaMaster.FinalProduct.Final_Product,
+                MixtureName = x.FormulaMaster.MixtureName,
                 ChemicalMasterName = x.Chemical.Name
             });
 
@@ -92,6 +93,7 @@ public class FormulaChemicalTransactionService(
         {
             FormulaMasterId = first.FormulaMasterId,
             FinalProductId = first.FormulaMaster.FinalProductId,
+            MixtureName = first.FormulaMaster.MixtureName,
 
             Chemicals = data.Select(x => new ChemicalItemDto
             {
@@ -115,6 +117,9 @@ public class FormulaChemicalTransactionService(
 
         // Map DTO → entity, ignoring Id and navigation properties
         var entity = _mapper.Map<FormulaChemicalTransaction>(dto);
+        entity.MixtureName = string.IsNullOrWhiteSpace(dto.MixtureName)
+            ? string.Empty
+            : dto.MixtureName.Trim();
 
         await _repository.AddAsync(entity);
 
@@ -164,6 +169,7 @@ public class FormulaChemicalTransactionService(
         {
             FormulaMasterId = formulaMasterId,
             FinalProductId = chemicals.First().FormulaMasterId,
+            MixtureName = chemicals.First().FormulaMaster?.MixtureName ?? string.Empty,
             Chemicals = chemicals.Select(c => new ChemicalItemDto
             {
                 ChemicalMasterId = c.ChemicalMasterId,
@@ -189,6 +195,9 @@ public class FormulaChemicalTransactionService(
             if (entity != null)
             {
                 entity.Qty = chemDto.Qty;
+                entity.MixtureName = string.IsNullOrWhiteSpace(dto.MixtureName)
+                    ? string.Empty
+                    : dto.MixtureName.Trim();
                 await _repository.UpdateAsync(entity.Id, entity);
             }
         }
@@ -199,6 +208,7 @@ public class FormulaChemicalTransactionService(
         {
             FormulaMasterId = dto.FormulaMasterId,
             FinalProductId = existingChemicals.First().FormulaMasterId,
+            MixtureName = existingChemicals.First().FormulaMaster?.MixtureName ?? string.Empty,
             Chemicals = existingChemicals.Select(c => new ChemicalItemDto
             {
                 ChemicalMasterId = c.ChemicalMasterId,

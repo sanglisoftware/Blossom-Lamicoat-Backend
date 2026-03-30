@@ -17,6 +17,21 @@ namespace Api
             CreateMap<Product, ProductDto>().ReverseMap();
             CreateMap<Employee, EmployeeDto>().ReverseMap();
             CreateMap<Salary, SalaryDto>().ReverseMap();
+            CreateMap<MixtureForm, MixtureFormDto>().ReverseMap();
+            CreateMap<InspectionForm, InspectionFormDto>()
+                .ForMember(dest => dest.ManufacturedFabricProductName, opt => opt.Ignore())
+                .ForMember(dest => dest.GradeName, opt => opt.Ignore());
+            CreateMap<InspectionFormDto, InspectionForm>()
+                .ForMember(dest => dest.ManufacturedFabricProduct, opt => opt.Ignore())
+                .ForMember(dest => dest.Grade, opt => opt.Ignore());
+            CreateMap<LaminationForm, LaminationFormDto>();
+            CreateMap<LaminationFormDto, LaminationForm>()
+                .ForMember(dest => dest.FinalProduct, opt => opt.Ignore())
+                .ForMember(dest => dest.ClothRollingForm, opt => opt.Ignore())
+                .ForMember(dest => dest.PVC, opt => opt.Ignore())
+                .ForMember(dest => dest.Chemical, opt => opt.Ignore())
+                .ForMember(dest => dest.Worker, opt => opt.Ignore());
+            CreateMap<ClothRollingForm, ClothRollingFormDto>().ReverseMap();
             CreateMap<News, NewsCreateDto>().ReverseMap();
             CreateMap<Shop, ShopDto>().ReverseMap();
             CreateMap<Menu, MenuDto>()

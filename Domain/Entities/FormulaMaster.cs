@@ -10,6 +10,8 @@ public class FormulaMaster
 
     public int FinalProductId { get; set; }
 
+    public string MixtureName { get; set; } = string.Empty;
+
     public FinalProduct? FinalProduct { get; set; }
 
 
@@ -18,4 +20,6 @@ public class FormulaMaster
 
     public ICollection<FormulaChemicalTransaction> formulaChemicalTransactions
     { get; set; } = new List<FormulaChemicalTransaction>();
+
+    public ICollection<MixtureForm> MixtureForms { get; set; } = new List<MixtureForm>();
 }

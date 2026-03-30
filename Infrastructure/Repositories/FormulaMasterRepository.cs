@@ -44,12 +44,13 @@ public class FormulaMasterRepository(AppDbContext _context) : IFormulaMasterRepo
 
     public IQueryable<FormulaMaster> Query() =>
         _context
-            .FormulaMaster.Include(e => e.FinalProduct) // Ensure Role is loaded
+            .FormulaMaster.Include(e => e.FinalProduct)
             .Select(x => new FormulaMaster
             {
-                Id = x.Id, // Add if needed            
-               Final_Product = x.FinalProduct!.Final_Product,
-
-                 IsActive = x.IsActive,
+                Id = x.Id,
+                FinalProductId = x.FinalProductId,
+                Final_Product = x.FinalProduct!.Final_Product,
+                MixtureName = x.MixtureName,
+                IsActive = x.IsActive,
             });
 }

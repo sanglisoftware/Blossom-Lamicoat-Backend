@@ -132,6 +132,14 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ISalaryRepository, SalaryRepository>();
 builder.Services.AddScoped<ISalaryService, SalaryService>();
+builder.Services.AddScoped<IMixtureFormRepository, MixtureFormRepository>();
+builder.Services.AddScoped<IMixtureFormService, MixtureFormService>();
+builder.Services.AddScoped<IInspectionFormRepository, InspectionFormRepository>();
+builder.Services.AddScoped<IInspectionFormService, InspectionFormService>();
+builder.Services.AddScoped<ILaminationFormRepository, LaminationFormRepository>();
+builder.Services.AddScoped<ILaminationFormService, LaminationFormService>();
+builder.Services.AddScoped<IClothRollingFormRepository, ClothRollingFormRepository>();
+builder.Services.AddScoped<IClothRollingFormService, ClothRollingFormService>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddHttpContextAccessor();
@@ -155,6 +163,43 @@ app.UseSwagger();
 app.UseSwaggerUI();
 // }
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var scriptNames = new[]
+    {
+        "create_m_mixtureform.sql",
+        "create_m_inspectionform.sql",
+        "alter_m_inspectionform_drop_inspectorname_rollno.sql",
+        "create_m_laminationform.sql",
+        "create_m_clothrollingform.sql",
+        "alter_m_laminationform_add_clothrollingform_id.sql",
+        "alter_m_formula_master_add_mixture_name.sql",
+        "alter_m_formula_chemical_transaction_add_mixture_name.sql",
+        "alter_m_mixtureform_add_mixture_name.sql",
+    };
+
+    foreach (var scriptName in scriptNames)
+    {
+        var scriptPath = Path.Combine(
+            app.Environment.ContentRootPath,
+            "Infrastructure",
+            "Data",
+            "Scripts",
+            scriptName
+        );
+
+        if (File.Exists(scriptPath))
+        {
+            var sql = File.ReadAllText(scriptPath);
+            if (!string.IsNullOrWhiteSpace(sql))
+            {
+                dbContext.Database.ExecuteSqlRaw(sql);
+            }
+        }
+    }
+}
+
 app.UseHttpsRedirection();
 app.UseAuthentication(); // JWT
 app.UseAuthorization(); // Role-based
@@ -171,6 +216,9 @@ app.MapRoleEndpoints();
 app.MapProductEndpoints();
 app.MapEmployeeEndpoints();
 app.MapSalaryEndpoints();
+app.MapMixtureFormEndpoints();
+app.MapLaminationFormEndpoints();
+app.MapClothRollingFormEndpoints();
 app.MapNewsEndpoints();
 app.MapMenuEndpoints();
 app.MapNutritionEndpoints();
@@ -196,6 +244,7 @@ app.MapFormulaChemicalTransactionEndpoints();
 app.MapChemicalInwardEndpoints();
 app.MapPVCInwardEndpoints();
 app.MapFabricInwardEndpoints();
+app.MapInspectionFormEndpoints();
 
 
 

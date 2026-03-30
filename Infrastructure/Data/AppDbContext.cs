@@ -39,6 +39,10 @@ namespace Api.Infrastructure.Data
         public DbSet<FinalProduct> FinalProduct { get; set; }
         public DbSet<FormulaMaster> FormulaMaster { get; set; }
         public DbSet<FormulaChemicalTransaction> FormulaChemicalTransaction { get; set; }
+        public DbSet<MixtureForm> MixtureForms { get; set; }
+        public DbSet<InspectionForm> InspectionForms { get; set; }
+        public DbSet<LaminationForm> LaminationForms { get; set; }
+        public DbSet<ClothRollingForm> ClothRollingForms { get; set; }
 
         public DbSet<ChemicalInward> ChemicalInward { get; set; }
         public DbSet<PVCInward> PVCInward { get; set; }
@@ -662,6 +666,12 @@ namespace Api.Infrastructure.Data
                     .HasMaxLength(200)
                     .IsUnicode(true);
 
+                entity
+                    .Property(e => e.MixtureName)
+                    .HasColumnName("mixture_name")
+                    .HasMaxLength(200)
+                    .IsUnicode(true);
+
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
 
@@ -679,12 +689,133 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Qty).HasColumnName("qty");
 
+                entity.Property(e => e.MixtureName)
+                    .HasColumnName("mixture_name")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
                 // Foreign Keys
 
                 entity.HasOne(e => e.FormulaMaster).WithMany(f => f.formulaChemicalTransactions).HasForeignKey(e => e.FormulaMasterId);
 
                 entity.HasOne(e => e.Chemical).WithMany(c => c.formulaChemicals).HasForeignKey(e => e.ChemicalMasterId);
 
+            });
+
+            modelBuilder.Entity<MixtureForm>(entity =>
+            {
+                entity.ToTable("m_mixtureform");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.FormulaMasterId).HasColumnName("formula_master_id");
+                entity.Property(e => e.TotalMixture).HasColumnName("total_mixture");
+                entity.Property(e => e.MixtureName)
+                    .HasColumnName("mixture_name")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity
+                    .HasOne(e => e.FormulaMaster)
+                    .WithMany(f => f.MixtureForms)
+                    .HasForeignKey(e => e.FormulaMasterId)
+                    .HasConstraintName("FK_m_mixtureform_m_formula_master");
+            });
+
+            modelBuilder.Entity<InspectionForm>(entity =>
+            {
+                entity.ToTable("m_inspectionform");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.ManufacturedFabricProductId).HasColumnName("manufactured_fabric_product_id");
+                entity.Property(e => e.GradeId).HasColumnName("grade_id");
+                entity.Property(e => e.Mtr).HasColumnName("mtr");
+                entity.Property(e => e.WastageMtr).HasColumnName("wastage_mtr");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity
+                    .HasOne(e => e.ManufacturedFabricProduct)
+                    .WithMany()
+                    .HasForeignKey(e => e.ManufacturedFabricProductId)
+                    .HasConstraintName("FK_m_inspectionform_m_fproductlist");
+
+                entity
+                    .HasOne(e => e.Grade)
+                    .WithMany()
+                    .HasForeignKey(e => e.GradeId)
+                    .HasConstraintName("FK_m_inspectionform_m_grade");
+            });
+
+            modelBuilder.Entity<LaminationForm>(entity =>
+            {
+                entity.ToTable("m_laminationform");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.FinalProductId).HasColumnName("final_product_id");
+                entity.Property(e => e.ClothRollingFormId).HasColumnName("cloth_roll_code_id");
+                entity.Property(e => e.ClothRollBatchNo).HasColumnName("cloth_roll_batch_no");
+                entity.Property(e => e.PVCMasterId).HasColumnName("pvc_master_id");
+                entity.Property(e => e.PVCBatchNo).HasColumnName("pvc_batch_no");
+                entity.Property(e => e.PVCQty).HasColumnName("pvc_qty");
+                entity.Property(e => e.ChemicalId).HasColumnName("chemical_id");
+                entity.Property(e => e.ChemicalQty).HasColumnName("chemical_qty");
+                entity.Property(e => e.Bounding).HasColumnName("bounding");
+                entity.Property(e => e.WorkerId).HasColumnName("worker_id");
+                entity.Property(e => e.Temperature).HasColumnName("temperature");
+                entity.Property(e => e.ProcessTime).HasColumnName("process_time");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity
+                    .HasOne(e => e.FinalProduct)
+                    .WithMany()
+                    .HasForeignKey(e => e.FinalProductId)
+                    .HasConstraintName("FK_m_laminationform_m_final_product");
+
+                entity
+                    .HasOne(e => e.ClothRollingForm)
+                    .WithMany()
+                    .HasForeignKey(e => e.ClothRollingFormId)
+                    .HasConstraintName("FK_m_laminationform_m_clothrollingform");
+
+                entity
+                    .HasOne(e => e.PVC)
+                    .WithMany()
+                    .HasForeignKey(e => e.PVCMasterId)
+                    .HasConstraintName("FK_m_laminationform_m_pvcproducttable");
+
+                entity
+                    .HasOne(e => e.Chemical)
+                    .WithMany()
+                    .HasForeignKey(e => e.ChemicalId)
+                    .HasConstraintName("FK_m_laminationform_m_chemical");
+
+                entity
+                    .HasOne(e => e.Worker)
+                    .WithMany()
+                    .HasForeignKey(e => e.WorkerId)
+                    .HasConstraintName("FK_m_laminationform_m_employee");
+            });
+
+            modelBuilder.Entity<ClothRollingForm>(entity =>
+            {
+                entity.ToTable("m_clothrollingform");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.ProductName).HasColumnName("product_name");
+                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+                entity.Property(e => e.RollMtr).HasColumnName("roll_mtr");
+                entity.Property(e => e.DefectMtr).HasColumnName("defect_mtr");
+                entity.Property(e => e.CheckerName).HasColumnName("checker_name");
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
             });
             
 
@@ -710,7 +841,6 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
-
                 // Foreign Keys
 
                 entity.HasOne(e => e.Supplier).WithMany(s => s.supplierInwards).HasForeignKey(e => e.SupplierMasterId);
@@ -718,7 +848,6 @@ namespace Api.Infrastructure.Data
                        entity.HasOne(e => e.Chemical).WithMany(c => c.chemicalInwards).HasForeignKey(e => e.ChemicalMasterId);
 
             });
-
 
 
               modelBuilder.Entity<PVCInward>(entity =>
@@ -786,7 +915,6 @@ namespace Api.Infrastructure.Data
 
             });
         }
-
 
         
     }

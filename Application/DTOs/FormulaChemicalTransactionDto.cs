@@ -12,6 +12,8 @@ public class FormulaChemicalTransactionDto
 
     public string? FinalProductName { get; set; }
 
+    public string? MixtureName { get; set; }
+
     public string? ChemicalMasterName { get; set; }
 
 }

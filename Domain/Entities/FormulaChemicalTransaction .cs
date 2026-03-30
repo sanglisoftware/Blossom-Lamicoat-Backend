@@ -9,7 +9,8 @@ namespace Api.Domain.Entities
         public int ChemicalMasterId { get; set; }
 
         public double Qty { get; set; }
-        
+
+        public string? MixtureName { get; set; }
 
         public FormulaMaster? FormulaMaster { get; set; }
 

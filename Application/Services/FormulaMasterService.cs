@@ -51,6 +51,7 @@ public class FormulaMasterService(IFormulaMasterRepository _repository, IMapper 
         {
             Id = formula.Id,
             FinalProductId = formula.FinalProductId,
+            MixtureName = formula.MixtureName,
             IsActive = formula.IsActive,
         };
     }
