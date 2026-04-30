@@ -16,6 +16,8 @@ namespace Api.Domain.Entities
 
         public DateTime ReceivedDate { get; set; }
 
+        public string? AttachedFile { get; set; }
+
         public short? IsActive { get; set; } 
         
         public Chemical? Chemical { get; set; }

@@ -16,11 +16,7 @@ public class PVCproductListRepository
 
     public IQueryable<PVCproductList> Query()
     {
-        return _context.PVCproductList
-            .Include(x => x.Colour)
-            .Include(x => x.Gramage)
-            .Include(x => x.Width);
-               
+        return _context.PVCproductList;
     }
 
     public async Task<PVCproductList?> GetByIdAsync(int id)

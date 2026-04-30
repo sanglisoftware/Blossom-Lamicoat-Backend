@@ -52,6 +52,8 @@ public class EmployeeRepository(AppDbContext _context) : IEmployeeRepository
                 MiddleName = x.MiddleName,
                 LastName = x.LastName,
                 Mobile = x.Mobile,
+                DailySalary = x.DailySalary,
+                RoleId = x.RoleId,
                 Type = x.Type,
                 ActiveStatus = x.ActiveStatus,
                 RoleValue = x.Role == null ? null : x.Role.RoleValue, // Now accessible

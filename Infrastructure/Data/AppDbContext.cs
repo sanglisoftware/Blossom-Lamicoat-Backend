@@ -219,6 +219,7 @@ namespace Api.Infrastructure.Data
                     .HasColumnName("mobile")
                     .HasMaxLength(15)
                     .IsRequired();
+                entity.Property(e => e.DailySalary).HasColumnName("daily_salary").HasColumnType("decimal(18,2)");
                 entity.Property(e => e.RoleId).HasColumnName("role_id");
                 entity
                     .Property(e => e.Username)
@@ -507,33 +508,12 @@ namespace Api.Infrastructure.Data
                     .IsUnicode(true);
 
                 entity
-                    .Property(e => e.GramageMasterId)
-                    .HasColumnName("gramage_master_id");
-                entity
-                    .Property(e => e.WidthMasterId)
-                    .HasColumnName("width_master_id");
-
-                entity
-                    .Property(e => e.ColourMasterId)
-                    .HasColumnName("colour_master_id");
-
-                entity
                     .Property(e => e.Comments)
                     .HasColumnName("comments")
                     .HasMaxLength(15)
                     .IsUnicode(true);
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
-
-
-                // Foreign Keys
-
-                entity.HasOne(e => e.Gramage).WithMany(s => s.PVCGramage).HasForeignKey(e => e.GramageMasterId);
-
-                entity.HasOne(e => e.Width).WithMany(s => s.PVCWidth).HasForeignKey(e => e.WidthMasterId);
-
-                entity.HasOne(e => e.Colour).WithMany(s => s.PVCColour).HasForeignKey(e => e.ColourMasterId);
-
             });
 
             modelBuilder.Entity<FGramage>(entity =>
@@ -562,13 +542,6 @@ namespace Api.Infrastructure.Data
                     .HasColumnName("name")
                     .HasMaxLength(200);
 
-                entity.Property(e => e.FGramageMasterId).HasColumnName("fgramage_master_id");
-
-                entity
-                    .Property(e => e.ColourMasterId)
-                    .HasColumnName("colour_master_id");
-                  
-
                 entity
                     .Property(e => e.Comments)
                     .HasColumnName("comments")
@@ -576,12 +549,6 @@ namespace Api.Infrastructure.Data
                     .IsUnicode(true);
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
-
-
-                entity.HasOne(e => e.FGramage).WithMany(s => s.Fgrmage).HasForeignKey(e => e.FGramageMasterId);
-
-
-              entity.HasOne(e => e.Colour).WithMany(s => s.FColour).HasForeignKey(e => e.ColourMasterId);
 
             });
 
@@ -839,6 +806,10 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.ReceivedDate).HasColumnName("received_date");
 
+                entity.Property(e => e.AttachedFile)
+                    .HasColumnName("attached_file")
+                    .HasMaxLength(500);
+
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
                 // Foreign Keys
@@ -872,9 +843,25 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Comments).HasColumnName("comments");
 
+                entity.Property(e => e.GramageMasterId).HasColumnName("gramage_master_id");
+
+                entity.Property(e => e.GramageName).HasColumnName("gramage_name");
+
+                entity.Property(e => e.WidthMasterId).HasColumnName("width_master_id");
+
+                entity.Property(e => e.WidthName).HasColumnName("width_name");
+
+                entity.Property(e => e.ColourMasterId).HasColumnName("colour_master_id");
+
+                entity.Property(e => e.ColourName).HasColumnName("colour_name");
+
                 entity.Property(e => e.BillDate).HasColumnName("bill_date");
 
                 entity.Property(e => e.ReceivedDate).HasColumnName("received_date");
+
+                entity.Property(e => e.AttachedFile)
+                    .HasColumnName("attached_file")
+                    .HasMaxLength(500);
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 

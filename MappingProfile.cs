@@ -48,23 +48,10 @@ namespace Api
             CreateMap<Width, WidthDto>().ReverseMap();
             CreateMap<FGramage, FGramageDto>().ReverseMap();
 
-            CreateMap<PVCproductList, PVCproductListDto>()
-             .ForMember(dest => dest.GramageMasterName,
-                 opt => opt.MapFrom(src => src.Gramage != null ? src.Gramage.GRM : null))
-             .ForMember(dest => dest.WidthMasterName,
-                 opt => opt.MapFrom(src => src.Width != null ? src.Width.GRM : null))
-             .ForMember(dest => dest.ColourMasterName,
-                 opt => opt.MapFrom(src => src.Colour != null ? src.Colour.Name : null));
+            CreateMap<PVCproductList, PVCproductListDto>();
 
-            CreateMap<PVCproductListDto, PVCproductList>()
-                .ForMember(dest => dest.Gramage, opt => opt.Ignore())
-                .ForMember(dest => dest.Width, opt => opt.Ignore())
-                .ForMember(dest => dest.Colour, opt => opt.Ignore());
+            CreateMap<PVCproductListDto, PVCproductList>();
 
-
-            CreateMap<FproductList, FproductListDto>()
-                .ForMember(dest => dest.FGramageMasterName, opt => opt.MapFrom(src => src.FGramage != null ? src.FGramage.GRM : null))
-                .ForMember(dest => dest.ColourMasterName, opt => opt.MapFrom(src => src.Colour != null ? src.Colour.Name : null));
 
             CreateMap<FproductList, FproductListDto>().ReverseMap();
             CreateMap<Quality, QualityDto>()

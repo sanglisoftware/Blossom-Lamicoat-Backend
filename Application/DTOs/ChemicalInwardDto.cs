@@ -16,6 +16,8 @@ public class ChemicalInwardDto
 
     public DateTime ReceivedDate { get; set; }
 
+    public string? AttachedFile { get; set; }
+
     public short? IsActive { get; set; }
 
     public string? ChemicalMasterName { get; set; }

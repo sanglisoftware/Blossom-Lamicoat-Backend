@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Api.Application.DTOs;
 using Api.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Api.API.EndPoints.Inventory
 {
@@ -12,11 +13,25 @@ namespace Api.API.EndPoints.Inventory
             var group = app.MapGroup("/api/pvcinward").RequireAuthorization();
 
             // GET all PVCInward
-            group.MapGet("/", async (HttpRequest req, IPVCInwardService service) =>
+            group.MapGet("/", async (HttpRequest req, IPVCInwardService service, ILoggerFactory loggerFactory) =>
             {
-                var query = RegexParseFilterSort.BindPagedQueryDto(req.Query);
-                var paged = await service.GetAllAsync(query);
-                return Results.Ok(paged);
+                try
+                {
+                    var query = RegexParseFilterSort.BindPagedQueryDto(req.Query);
+                    var paged = await service.GetAllAsync(query);
+                    return Results.Ok(paged);
+                }
+                catch (Exception ex)
+                {
+                    var logger = loggerFactory.CreateLogger("PVCInwardEndpoints");
+                    logger.LogError(ex, "Failed to load PVC inward list");
+
+                    return Results.Problem(
+                        title: "Failed to load PVC inward list",
+                        detail: ex.InnerException?.Message ?? ex.Message,
+                        statusCode: StatusCodes.Status500InternalServerError
+                    );
+                }
             }).RequireAuthorization();
             //Get all PVCInward for tabulator
             group.MapGet("/tabulator", GetPagedPVCInward).RequireAuthorization();
@@ -30,10 +45,50 @@ namespace Api.API.EndPoints.Inventory
 
             // POST create new PVCInward
             
-               group.MapPost("/", async (PVCInwardDto dto, IPVCInwardService service) =>
+               group.MapPost("/", async (
+                    HttpContext httpContext,
+                    [FromForm] int supplierMasterId,
+                    [FromForm] int pvcMasterId,
+                    [FromForm] string new_RollNo,
+                    [FromForm] double batchNo,
+                    [FromForm] double qty_kg,
+                    [FromForm] double qty_Mtr,
+                    [FromForm] string comments,
+                    [FromForm] int? gramageMasterId,
+                    [FromForm] string? gramageName,
+                    [FromForm] int? widthMasterId,
+                    [FromForm] string? widthName,
+                    [FromForm] int? colourMasterId,
+                    [FromForm] string? colourName,
+                    [FromForm] DateTime? billDate,
+                    [FromForm] DateTime? receivedDate,
+                    [FromForm] short? isActive,
+                    IFormFile? attachedFile,
+                    IPVCInwardService service) =>
             {
                 try
                 {
+                    var dto = new PVCInwardDto
+                    {
+                        SupplierMasterId = supplierMasterId,
+                        PVCMasterId = pvcMasterId,
+                        New_RollNo = new_RollNo,
+                        BatchNo = batchNo,
+                        Qty_kg = qty_kg,
+                        Qty_Mtr = qty_Mtr,
+                        Comments = comments,
+                        GramageMasterId = gramageMasterId,
+                        GramageName = gramageName,
+                        WidthMasterId = widthMasterId,
+                        WidthName = widthName,
+                        ColourMasterId = colourMasterId,
+                        ColourName = colourName,
+                        BillDate = billDate,
+                        ReceivedDate = receivedDate,
+                        IsActive = isActive,
+                        AttachedFile = await SaveAttachedFileAsync(httpContext, attachedFile),
+                    };
+
                     var created = await service.CreateAsync(dto);
                     return Results.Created($"/api/pvcinward/{created.Id}", created);
                 }
@@ -44,10 +99,53 @@ namespace Api.API.EndPoints.Inventory
             });
 
             // PUT update PVCInward
-            group.MapPut("/{id:int}", async (int id, PVCInwardDto dto, IPVCInwardService service) =>
+            group.MapPut("/{id:int}", async (
+                int id,
+                HttpContext httpContext,
+                [FromForm] int supplierMasterId,
+                [FromForm] int pvcMasterId,
+                [FromForm] string new_RollNo,
+                [FromForm] double batchNo,
+                [FromForm] double qty_kg,
+                [FromForm] double qty_Mtr,
+                [FromForm] string comments,
+                [FromForm] int? gramageMasterId,
+                [FromForm] string? gramageName,
+                [FromForm] int? widthMasterId,
+                [FromForm] string? widthName,
+                [FromForm] int? colourMasterId,
+                [FromForm] string? colourName,
+                [FromForm] DateTime? billDate,
+                [FromForm] DateTime? receivedDate,
+                [FromForm] short? isActive,
+                [FromForm] string? existingAttachedFile,
+                IFormFile? attachedFile,
+                IPVCInwardService service) =>
             {
                 try
                 {
+                    var dto = new PVCInwardDto
+                    {
+                        Id = id,
+                        SupplierMasterId = supplierMasterId,
+                        PVCMasterId = pvcMasterId,
+                        New_RollNo = new_RollNo,
+                        BatchNo = batchNo,
+                        Qty_kg = qty_kg,
+                        Qty_Mtr = qty_Mtr,
+                        Comments = comments,
+                        GramageMasterId = gramageMasterId,
+                        GramageName = gramageName,
+                        WidthMasterId = widthMasterId,
+                        WidthName = widthName,
+                        ColourMasterId = colourMasterId,
+                        ColourName = colourName,
+                        BillDate = billDate,
+                        ReceivedDate = receivedDate,
+                        IsActive = isActive,
+                        AttachedFile = await SaveAttachedFileAsync(httpContext, attachedFile) ?? existingAttachedFile,
+                    };
+
                     var updated = await service.UpdateAsync(id, dto);
                     return updated is null ? Results.NotFound() : Results.Ok(updated);
                 }
@@ -72,11 +170,25 @@ namespace Api.API.EndPoints.Inventory
             }).RequireAuthorization();
         }
 
-        private static async Task<IResult> GetPagedPVCInward(HttpRequest req, IPVCInwardService service)
+        private static async Task<IResult> GetPagedPVCInward(HttpRequest req, IPVCInwardService service, ILoggerFactory loggerFactory)
         {
-            var query = BindPagedQueryDto(req.Query);
-            var paged = await service.GetAllAsync(query);
-            return Results.Ok(paged);
+            try
+            {
+                var query = BindPagedQueryDto(req.Query);
+                var paged = await service.GetAllAsync(query);
+                return Results.Ok(paged);
+            }
+            catch (Exception ex)
+            {
+                var logger = loggerFactory.CreateLogger("PVCInwardEndpoints");
+                logger.LogError(ex, "Failed to load PVC inward tabulator list");
+
+                return Results.Problem(
+                    title: "Failed to load PVC inward tabulator list",
+                    detail: ex.InnerException?.Message ?? ex.Message,
+                    statusCode: StatusCodes.Status500InternalServerError
+                );
+            }
         }
         private static PagedQueryDto BindPagedQueryDto(IQueryCollection q)
         {
@@ -146,5 +258,29 @@ namespace Api.API.EndPoints.Inventory
         private static partial Regex MyRegex();
         [GeneratedRegex(@"^filter\[(\d+)\]\[(field|type|value)\]$")]
         private static partial Regex MyRegex1();
+
+        private static async Task<string?> SaveAttachedFileAsync(HttpContext httpContext, IFormFile? attachedFile)
+        {
+            if (attachedFile == null || attachedFile.Length == 0)
+            {
+                return null;
+            }
+
+            var uploadsFolder = Path.Combine(
+                httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().WebRootPath ?? Path.Combine(AppContext.BaseDirectory, "wwwroot"),
+                "uploads",
+                "pvcinward"
+            );
+
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{Guid.NewGuid():N}_{Path.GetFileName(attachedFile.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            await using var stream = File.Create(filePath);
+            await attachedFile.CopyToAsync(stream);
+
+            return $"/uploads/pvcinward/{fileName}";
+        }
     }
 }

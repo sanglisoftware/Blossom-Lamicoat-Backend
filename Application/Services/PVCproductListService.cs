@@ -51,9 +51,6 @@ public class PVCproductListService(IPVCproductListRepository _repository, IMappe
         {
             Id = PVC.Id,
             Name = PVC.Name,
-            GramageMasterId = PVC.GramageMasterId,
-            WidthMasterId = PVC.WidthMasterId,
-            ColourMasterId = PVC.ColourMasterId,
             Comments = PVC.Comments,
             IsActive = PVC.IsActive,
         };
@@ -71,8 +68,13 @@ public class PVCproductListService(IPVCproductListRepository _repository, IMappe
                 throw new ArgumentException("Username already exists");
             }
 
-            // 2. Create Customer
-            var pvcproductlist = _mapper.Map<PVCproductList>(dto);
+            var pvcproductlist = new PVCproductList
+            {
+                Name = dto.Name,
+                Comments = dto.Comments,
+                IsActive = dto.IsActive,
+            };
+
             await _repository.AddAsync(pvcproductlist);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -95,8 +97,10 @@ public class PVCproductListService(IPVCproductListRepository _repository, IMappe
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null) return null;
 
-            _mapper.Map(dto, existing);
-            existing.Id = id;
+            existing.Name = dto.Name;
+            existing.Comments = dto.Comments;
+            existing.IsActive = dto.IsActive ?? existing.IsActive;
+
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
             return _mapper.Map<PVCproductListDto>(existing);

@@ -73,7 +73,15 @@ namespace Api.Application.Services
             // Handle nested properties
             foreach (var member in propertyPath.Split('.'))
             {
-                property = Expression.Property(property, member);
+                var propertyInfo = property.Type.GetProperties()
+                    .FirstOrDefault(p => p.Name.Equals(member, StringComparison.OrdinalIgnoreCase));
+
+                if (propertyInfo == null)
+                {
+                    return null;
+                }
+
+                property = Expression.Property(property, propertyInfo);
             }
 
             var lambda = Expression.Lambda(property, parameter);

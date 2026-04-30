@@ -12,6 +12,23 @@ namespace Api.Application.Services;
 public class PVCInwardService(IPVCInwardRepository _repository, IMapper _mapper, AppDbContext _context) : IPVCInwardService
 {
     private static readonly string[] _excludedSearchProperties = [""];
+    private static readonly Dictionary<string, string> _sortFieldMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["id"] = nameof(PVCInwardDto.Id),
+        ["supplierMasterName"] = nameof(PVCInwardDto.SupplierMasterName),
+        ["pvcMasterName"] = nameof(PVCInwardDto.PVCMasterName),
+        ["new_RollNo"] = nameof(PVCInwardDto.New_RollNo),
+        ["batchNo"] = nameof(PVCInwardDto.BatchNo),
+        ["qty_kg"] = nameof(PVCInwardDto.Qty_kg),
+        ["qty_Mtr"] = nameof(PVCInwardDto.Qty_Mtr),
+        ["comments"] = nameof(PVCInwardDto.Comments),
+        ["gramageName"] = nameof(PVCInwardDto.GramageName),
+        ["widthName"] = nameof(PVCInwardDto.WidthName),
+        ["colourName"] = nameof(PVCInwardDto.ColourName),
+        ["billDate"] = nameof(PVCInwardDto.BillDate),
+        ["receivedDate"] = nameof(PVCInwardDto.ReceivedDate),
+        ["isActive"] = nameof(PVCInwardDto.IsActive),
+    };
 
     public async Task<PagedResultDto<PVCInwardDto>> GetAllAsync(PagedQueryDto query)
     {
@@ -43,32 +60,40 @@ public class PVCInwardService(IPVCInwardRepository _repository, IMapper _mapper,
 
         var total = await q.CountAsync();
 
-        // Apply sorting
-        q = SortHelper.ApplySorting(q, query.sort, s => s.Field, s => s.Dir) ?? q.OrderByDescending(n => n.Id);
+        var projectedQuery = q.Select(f => new PVCInwardDto
+        {
+            Id = f.Id,
+            SupplierMasterId = f.SupplierMasterId,
+            PVCMasterId = f.PVCMasterId,
+            New_RollNo = f.New_RollNo,
+            BatchNo = f.BatchNo,
+            Qty_kg = f.Qty_kg,
+            Qty_Mtr = f.Qty_Mtr,
+            Comments = f.Comments,
+            GramageMasterId = f.GramageMasterId,
+            GramageName = f.GramageName,
+            WidthMasterId = f.WidthMasterId,
+            WidthName = f.WidthName,
+            ColourMasterId = f.ColourMasterId,
+            ColourName = f.ColourName,
+            BillDate = f.BillDate,
+            ReceivedDate = f.ReceivedDate,
+            AttachedFile = f.AttachedFile,
+            IsActive = f.IsActive,
+            SupplierMasterName = f.Supplier != null ? f.Supplier.Name : string.Empty,
+            PVCMasterName = f.PVC != null ? f.PVC.Name : string.Empty,
+        });
+
+        var normalizedSorts = NormalizeSorts(query.sort);
+        projectedQuery = SortHelper.ApplySorting(projectedQuery, normalizedSorts, s => s.Field, s => s.Dir)
+            ?? projectedQuery.OrderByDescending(n => n.Id);
 
         // Pagination
         var skip = (query.page - 1) * query.size;
-        //var items = await q.Skip(skip).Take(query.size).ToListAsync();
-        var items = await q
-    .Skip(skip)
-    .Take(query.size)
-    .Select(f => new PVCInwardDto
-    {
-        Id = f.Id,
-        SupplierMasterId = f.SupplierMasterId,
-        PVCMasterId = f.PVCMasterId,
-        New_RollNo = f.New_RollNo,
-        BatchNo = f.BatchNo,
-        Qty_kg = f.Qty_kg,
-        Qty_Mtr = f.Qty_Mtr,
-        Comments = f.Comments,
-        BillDate = f.BillDate,
-        ReceivedDate = f.ReceivedDate,
-        IsActive = f.IsActive,
-        SupplierMasterName = f.Supplier != null ? f.Supplier.Name : string.Empty,
-        PVCMasterName = f.PVC != null ? f.PVC.Name : string.Empty,
-    })
-    .ToListAsync();
+        var items = await projectedQuery
+            .Skip(skip)
+            .Take(query.size)
+            .ToListAsync();
 
         return new PagedResultDto<PVCInwardDto>
         {
@@ -94,8 +119,15 @@ public class PVCInwardService(IPVCInwardRepository _repository, IMapper _mapper,
             Qty_kg = pvcInward.Qty_kg,
             Qty_Mtr = pvcInward.Qty_Mtr,
             Comments = pvcInward.Comments,
+            GramageMasterId = pvcInward.GramageMasterId,
+            GramageName = pvcInward.GramageName,
+            WidthMasterId = pvcInward.WidthMasterId,
+            WidthName = pvcInward.WidthName,
+            ColourMasterId = pvcInward.ColourMasterId,
+            ColourName = pvcInward.ColourName,
             BillDate = pvcInward.BillDate,
             ReceivedDate = pvcInward.ReceivedDate,
+            AttachedFile = pvcInward.AttachedFile,
             IsActive = pvcInward.IsActive,
             // ChemicalMasterName = chemicalInward.Name,
             // SupplierMasterName = chemicalInward.SupplierMaster.Name,
@@ -138,8 +170,23 @@ public class PVCInwardService(IPVCInwardRepository _repository, IMapper _mapper,
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null) return null;
 
-            _mapper.Map(dto, existing);
-            existing.Id = id;
+            existing.SupplierMasterId = dto.SupplierMasterId;
+            existing.PVCMasterId = dto.PVCMasterId;
+            existing.New_RollNo = dto.New_RollNo;
+            existing.BatchNo = dto.BatchNo;
+            existing.Qty_kg = dto.Qty_kg;
+            existing.Qty_Mtr = dto.Qty_Mtr;
+            existing.Comments = dto.Comments;
+            existing.GramageMasterId = dto.GramageMasterId;
+            existing.GramageName = dto.GramageName;
+            existing.WidthMasterId = dto.WidthMasterId;
+            existing.WidthName = dto.WidthName;
+            existing.ColourMasterId = dto.ColourMasterId;
+            existing.ColourName = dto.ColourName;
+            existing.BillDate = dto.BillDate;
+            existing.ReceivedDate = dto.ReceivedDate;
+            existing.AttachedFile = dto.AttachedFile;
+            existing.IsActive = dto.IsActive ?? existing.IsActive;
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
             return _mapper.Map<PVCInwardDto>(existing);
@@ -181,5 +228,22 @@ public class PVCInwardService(IPVCInwardRepository _repository, IMapper _mapper,
         existing.IsActive = IsActive;
         var updated = await _repository.UpdateAsync(id, existing);
         return updated is null ? null : _mapper.Map<PVCInwardDto>(updated);
+    }
+
+    private static List<SortDto> NormalizeSorts(IList<SortDto>? sorts)
+    {
+        if (sorts == null || sorts.Count == 0)
+        {
+            return [];
+        }
+
+        return sorts
+            .Where(s => !string.IsNullOrWhiteSpace(s.Field))
+            .Select(s => new SortDto
+            {
+                Field = _sortFieldMap.TryGetValue(s.Field, out var mappedField) ? mappedField : s.Field,
+                Dir = s.Dir,
+            })
+            .ToList();
     }
 }

@@ -14,10 +14,7 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
 
     public async Task<PagedResultDto<FproductListDto>> GetAllAsync(PagedQueryDto query)
 {
-    var q = _context.FproductList
-        .Include(x => x.FGramage)
-        .Include(x => x.Colour)
-        .AsQueryable();
+    var q = _context.FproductList.AsQueryable();
 
     if (query.filter.Any(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)))
     {
@@ -43,12 +40,8 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
         {
             Id = x.Id,
             Name = x.Name,
-            FGramageMasterId = x.FGramageMasterId,
-            ColourMasterId = x.ColourMasterId,
             Comments = x.Comments,
-            IsActive = x.IsActive,
-            FGramageMasterName = x.FGramage != null ? x.FGramage.GRM : null,
-            ColourMasterName = x.Colour != null ? x.Colour.Name : null
+            IsActive = x.IsActive
         })
         .ToListAsync();
 
@@ -70,8 +63,6 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
         {
             Id = fproductList.Id,
             Name = fproductList.Name,
-            FGramageMasterId = fproductList.FGramageMasterId,
-            ColourMasterId = fproductList.ColourMasterId,
             Comments = fproductList.Comments,
             IsActive = fproductList.IsActive,
         };
@@ -113,8 +104,9 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null) return null;
 
-            _mapper.Map(dto, existing);
-            existing.Id = id;
+            existing.Name = dto.Name;
+            existing.Comments = dto.Comments;
+            existing.IsActive = dto.IsActive ?? existing.IsActive;
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
             return _mapper.Map<FproductListDto>(existing);

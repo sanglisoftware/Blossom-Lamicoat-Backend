@@ -73,6 +73,7 @@ public class ChemicalInwardService(IChemicalInwardRepository _repository, IMappe
             BatchNo = chemicalInward.BatchNo,
             BillDate = chemicalInward.BillDate,
             ReceivedDate = chemicalInward.ReceivedDate,
+            AttachedFile = chemicalInward.AttachedFile,
             // ChemicalMasterName = chemicalInward.Name,
             // SupplierMasterName = chemicalInward.SupplierMaster.Name,
         };

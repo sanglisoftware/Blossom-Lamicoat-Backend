@@ -16,9 +16,7 @@ public class FproductListRepository
 
     public IQueryable<FproductList> Query()
     {
-        return _context.FproductList
-            .Include(x => x.Colour)
-            .Include(x => x.FGramage);
+        return _context.FproductList;
 
                
     }
@@ -67,8 +65,6 @@ public class FproductListRepository
     public async Task<IEnumerable<FproductList>> GetAllAsync()
     {
         return await _context.FproductList
-            .Include(x => x.Colour)
-            .Include(x => x.FGramage)
             .ToListAsync();
     }
 }

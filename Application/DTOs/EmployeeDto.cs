@@ -12,6 +12,8 @@ public class EmployeeDto
 
     public string Mobile { get; set; } = string.Empty;
 
+    public decimal? DailySalary { get; set; }
+
     public short? Type { get; set; }
 
 

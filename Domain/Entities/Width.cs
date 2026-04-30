@@ -5,10 +5,6 @@ namespace Api.Domain.Entities
     {
         public int Id { get; set; }
         public string GRM { get; set; } = string.Empty;
-        public short? IsActive { get; set; } 
-
-          public ICollection<PVCproductList> PVCWidth
-        { get; set; } = new List<PVCproductList>(); 
-        
+        public short? IsActive { get; set; }
     }
 }
