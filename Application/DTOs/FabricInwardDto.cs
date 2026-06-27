@@ -8,17 +8,27 @@ public class FabricInwardDto
 
     public int FabricMasterId { get; set; }
 
+    public int? FGramageMasterId { get; set; }
+
+    public int? ColourMasterId { get; set; }
+
     public double BatchNo { get; set; }
 
     public double QtyMTR { get; set; }
 
     public string Comments { get; set; } = string.Empty;
 
+    public string? AttachedFile { get; set; }
+
     public short? IsActive { get; set; }
 
      public string? SupplierMasterName { get; set; }
      
     public string? FabricMasterName { get; set; }
+
+    public string? FGramageMasterName { get; set; }
+
+    public string? ColourMasterName { get; set; }
 
 
 }

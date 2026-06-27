@@ -14,9 +14,16 @@ namespace Api.API.EndPoints.Inventory
             // GET all Fabric productList
             group.MapGet("/", async (HttpRequest req, IFproductListService service) =>
             {
-                var query = RegexParseFilterSort.BindPagedQueryDto(req.Query);
-                var paged = await service.GetAllAsync(query);
-                return Results.Ok(paged);
+                try
+                {
+                    var query = RegexParseFilterSort.BindPagedQueryDto(req.Query);
+                    var paged = await service.GetAllAsync(query);
+                    return Results.Ok(paged);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
             }).RequireAuthorization();
             //Get all Fabric productList for tabulator
             group.MapGet("/tabulator", GetPagedFproductList).RequireAuthorization();
@@ -24,8 +31,15 @@ namespace Api.API.EndPoints.Inventory
             // GET Fabric productList by ID
             group.MapGet("/{id:int}", async (int id, IFproductListService service) =>
             {
-                var fproductlist = await service.GetByIdAsync(id);
-                return fproductlist is null ? Results.NotFound() : Results.Ok(fproductlist);
+                try
+                {
+                    var fproductlist = await service.GetByIdAsync(id);
+                    return fproductlist is null ? Results.NotFound() : Results.Ok(fproductlist);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem(ex.Message);
+                }
             });
 
             // POST create new PVCproductList
@@ -73,9 +87,16 @@ namespace Api.API.EndPoints.Inventory
 
         private static async Task<IResult> GetPagedFproductList(HttpRequest req, IFproductListService service)
         {
-            var query = BindPagedQueryDto(req.Query);
-            var paged = await service.GetAllAsync(query);
-            return Results.Ok(paged);
+            try
+            {
+                var query = BindPagedQueryDto(req.Query);
+                var paged = await service.GetAllAsync(query);
+                return Results.Ok(paged);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(ex.Message);
+            }
         }
         private static PagedQueryDto BindPagedQueryDto(IQueryCollection q)
         {

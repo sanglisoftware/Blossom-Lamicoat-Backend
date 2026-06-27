@@ -886,11 +886,19 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.FabricMasterId).HasColumnName("fabric_master_id");
 
+                entity.Property(e => e.FGramageMasterId).HasColumnName("grmmsterid");
+
+                entity.Property(e => e.ColourMasterId).HasColumnName("colourmasterid");
+
                 entity.Property(e => e.BatchNo).HasColumnName("batch_no");
 
                 entity.Property(e => e.QtyMTR).HasColumnName("qty_mtr");
 
                 entity.Property(e => e.Comments).HasColumnName("comments");
+
+                entity.Property(e => e.AttachedFile)
+                    .HasColumnName("attached_file")
+                    .HasMaxLength(500);
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
 
@@ -899,6 +907,10 @@ namespace Api.Infrastructure.Data
                 entity.HasOne(e => e.Supplier).WithMany(s => s.supplierFInwards).HasForeignKey(e => e.SupplierMasterId);
 
                 entity.HasOne(e => e.Fabric).WithMany(c => c.fabricInwards).HasForeignKey(e => e.FabricMasterId);
+
+                entity.HasOne(e => e.FGramage).WithMany().HasForeignKey(e => e.FGramageMasterId);
+
+                entity.HasOne(e => e.Colour).WithMany().HasForeignKey(e => e.ColourMasterId);
 
             });
         }

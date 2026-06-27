@@ -13,46 +13,45 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
     private static readonly string[] _excludedSearchProperties = ["IsActive", "Id", "SrNo",];
 
     public async Task<PagedResultDto<FproductListDto>> GetAllAsync(PagedQueryDto query)
-{
-    var q = _context.FproductList.AsQueryable();
-
-    if (query.filter.Any(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)))
     {
-        var searchTerms = query.filter
-            .Where(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase))
-            .Select(f => f.Value)
-            .ToList();
+        var q = _context.FproductList.AsQueryable();
 
-        q = q.Where(SearchHelper.BuildGlobalSearchPredicate<FproductList>(searchTerms, _excludedSearchProperties));
-    }
-
-    var total = await q.CountAsync();
-
-    q = SortHelper.ApplySorting(q, query.sort, s => s.Field, s => s.Dir)
-        ?? q.OrderByDescending(n => n.Id);
-
-    var skip = (query.page - 1) * query.size;
-
-    var items = await q
-        .Skip(skip)
-        .Take(query.size)
-        .Select(x => new FproductListDto
+        if (query.filter.Any(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase)))
         {
-            Id = x.Id,
-            Name = x.Name,
-            Comments = x.Comments,
-            IsActive = x.IsActive
-        })
-        .ToListAsync();
+            var searchTerms = query.filter
+                .Where(f => f.Type.Equals("like", StringComparison.OrdinalIgnoreCase))
+                .Select(f => f.Value)
+                .ToList();
 
-    return new PagedResultDto<FproductListDto>
-    {
-        Items = items,
-        TotalCount = total,
-        Page = query.page,
-        Size = query.size
-    };
-}
+            q = q.Where(SearchHelper.BuildGlobalSearchPredicate<FproductList>(searchTerms, _excludedSearchProperties));
+        }
+
+        var total = await q.CountAsync();
+
+        q = SortHelper.ApplySorting(q, query.sort, s => s.Field, s => s.Dir)
+            ?? q.OrderByDescending(n => n.Id);
+
+        var skip = (query.page - 1) * query.size;
+        var items = await q
+            .Skip(skip)
+            .Take(query.size)
+            .Select(x => new FproductListDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Comments = x.Comments,
+                IsActive = x.IsActive
+            })
+            .ToListAsync();
+
+        return new PagedResultDto<FproductListDto>
+        {
+            Items = items,
+            TotalCount = total,
+            Page = query.page,
+            Size = query.size,
+        };
+    }
 
     public async Task<FproductListDto?> GetByIdAsync(int id)
     {
@@ -74,14 +73,18 @@ public class FproductListService(IFproductListRepository _repository, IMapper _m
 
         try
         {
-            // 1. Check username exists in either table
-            if (await _context.PVCproductList.AnyAsync(e => e.Name == dto.Name))
+            if (await _context.FproductList.AnyAsync(e => e.Name == dto.Name))
             {
                 throw new ArgumentException("Username already exists");
             }
 
-            // 2. Create Customer
-            var fproductList = _mapper.Map<FproductList>(dto);
+            var fproductList = new FproductList
+            {
+                Name = dto.Name,
+                Comments = dto.Comments,
+                IsActive = dto.IsActive,
+            };
+
             await _repository.AddAsync(fproductList);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();

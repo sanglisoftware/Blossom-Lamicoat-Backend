@@ -19,6 +19,8 @@ public class FabricInwardRepository
         return _context.FabricInward
             .Include(x => x.Supplier)
             .Include(x => x.Fabric)
+            .Include(x => x.FGramage)
+            .Include(x => x.Colour)
                 .AsNoTracking();
     }
 
@@ -27,6 +29,8 @@ public class FabricInwardRepository
         return await _context.FabricInward
             .Include(x => x.Supplier)
             .Include(x => x.Fabric)
+            .Include(x => x.FGramage)
+            .Include(x => x.Colour)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 

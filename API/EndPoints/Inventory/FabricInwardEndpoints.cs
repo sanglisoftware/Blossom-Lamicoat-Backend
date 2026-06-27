@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Api.Application.DTOs;
 using Api.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.API.EndPoints.Inventory
@@ -30,10 +31,11 @@ namespace Api.API.EndPoints.Inventory
 
             // POST create new FabricInward
               // POST create new colour
-               group.MapPost("/", async (FabricInwardDto dto, IFabricInwardService service) =>
+            group.MapPost("/", async (HttpContext httpContext, IFabricInwardService service) =>
             {
                 try
                 {
+                    var dto = await BuildFabricInwardDtoAsync(httpContext);
                     var created = await service.CreateAsync(dto);
                     return Results.Created($"/api/fabricinward/{created.Id}", created);
                 }
@@ -41,13 +43,14 @@ namespace Api.API.EndPoints.Inventory
                 {
                     return Results.Problem(ex.Message);
                 }
-            });
+            }).DisableAntiforgery();
 
             // PUT update FabricInward
-            group.MapPut("/{id:int}", async (int id, FabricInwardDto dto, IFabricInwardService service) =>
+            group.MapPut("/{id:int}", async (int id, HttpContext httpContext, IFabricInwardService service) =>
             {
                 try
                 {
+                    var dto = await BuildFabricInwardDtoAsync(httpContext, id);
                     var updated = await service.UpdateAsync(id, dto);
                     return updated is null ? Results.NotFound() : Results.Ok(updated);
                 }
@@ -55,7 +58,7 @@ namespace Api.API.EndPoints.Inventory
                 {
                     return Results.Problem("Username Alredy Exist" + ex.Message);
                 }
-            });
+            }).DisableAntiforgery();
 
             // DELETE FabricInward
             group.MapDelete("/{id:int}", async (int id, IFabricInwardService service) =>
@@ -146,5 +149,100 @@ namespace Api.API.EndPoints.Inventory
         private static partial Regex MyRegex();
         [GeneratedRegex(@"^filter\[(\d+)\]\[(field|type|value)\]$")]
         private static partial Regex MyRegex1();
+
+        private static async Task<FabricInwardDto> BuildFabricInwardDtoAsync(HttpContext httpContext, int? id = null)
+        {
+            if (!httpContext.Request.HasFormContentType)
+            {
+                var dto = await httpContext.Request.ReadFromJsonAsync<FabricInwardDto>();
+                if (dto == null)
+                {
+                    throw new BadHttpRequestException("Invalid request body.");
+                }
+
+                if (id.HasValue)
+                {
+                    dto.Id = id.Value;
+                }
+
+                return dto;
+            }
+
+            var form = await httpContext.Request.ReadFormAsync();
+            var dtoFromForm = new FabricInwardDto
+            {
+                Id = id ?? ParseRequiredInt(form, "id"),
+                SupplierMasterId = ParseRequiredInt(form, "supplierMasterId"),
+                FabricMasterId = ParseRequiredInt(form, "fabricMasterId"),
+                FGramageMasterId = ParseNullableInt(form, "fGramageMasterId"),
+                ColourMasterId = ParseNullableInt(form, "colourMasterId"),
+                BatchNo = ParseRequiredDouble(form, "batchNo"),
+                QtyMTR = ParseRequiredDouble(form, "qtyMTR"),
+                Comments = form["comments"].ToString(),
+                IsActive = ParseNullableShort(form, "isActive"),
+                AttachedFile = await SaveAttachedFileAsync(httpContext, form.Files["attachedFile"])
+                    ?? form["existingAttachedFile"].ToString(),
+            };
+
+            return dtoFromForm;
+        }
+
+        private static int ParseRequiredInt(IFormCollection form, string key)
+        {
+            var rawValue = form[key].ToString();
+            if (!int.TryParse(rawValue, out var value))
+            {
+                throw new BadHttpRequestException($"{key} is required.");
+            }
+
+            return value;
+        }
+
+        private static int? ParseNullableInt(IFormCollection form, string key)
+        {
+            var rawValue = form[key].ToString();
+            return int.TryParse(rawValue, out var value) ? value : null;
+        }
+
+        private static double ParseRequiredDouble(IFormCollection form, string key)
+        {
+            var rawValue = form[key].ToString();
+            if (!double.TryParse(rawValue, out var value))
+            {
+                throw new BadHttpRequestException($"{key} is required.");
+            }
+
+            return value;
+        }
+
+        private static short? ParseNullableShort(IFormCollection form, string key)
+        {
+            var rawValue = form[key].ToString();
+            return short.TryParse(rawValue, out var value) ? value : null;
+        }
+
+        private static async Task<string?> SaveAttachedFileAsync(HttpContext httpContext, IFormFile? attachedFile)
+        {
+            if (attachedFile == null || attachedFile.Length == 0)
+            {
+                return null;
+            }
+
+            var uploadsFolder = Path.Combine(
+                httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().WebRootPath,
+                "uploads",
+                "fabricinward"
+            );
+
+            Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{Guid.NewGuid():N}_{Path.GetFileName(attachedFile.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await attachedFile.CopyToAsync(stream);
+
+            return $"/uploads/fabricinward/{fileName}";
+        }
     }
 }

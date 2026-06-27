@@ -179,6 +179,8 @@ using (var scope = app.Services.CreateScope())
         "alter_m_mixtureform_add_mixture_name.sql",
         "alter_m_chemical_inword_add_attached_file.sql",
         "alter_m_pvc_inward_add_dimensions.sql",
+        "alter_m_fabric_inward_add_dimensions.sql",
+        "alter_m_fabric_inward_add_attached_file.sql",
     };
 
     foreach (var scriptName in scriptNames)

@@ -103,9 +103,15 @@ namespace Api
                     opt => opt.MapFrom(src => src.Fabric != null ? src.Fabric.Name : string.Empty))
                 .ForMember(dest => dest.SupplierMasterName,
                     opt => opt.MapFrom(src => src.Supplier != null ? src.Supplier.Name : string.Empty))
+                .ForMember(dest => dest.FGramageMasterName,
+                    opt => opt.MapFrom(src => src.FGramage != null ? src.FGramage.GRM : string.Empty))
+                .ForMember(dest => dest.ColourMasterName,
+                    opt => opt.MapFrom(src => src.Colour != null ? src.Colour.Name : string.Empty))
                 .ReverseMap()
                 .ForMember(dest => dest.Fabric, opt => opt.Ignore())
-                .ForMember(dest => dest.Supplier, opt => opt.Ignore());
+                .ForMember(dest => dest.Supplier, opt => opt.Ignore())
+                .ForMember(dest => dest.FGramage, opt => opt.Ignore())
+                .ForMember(dest => dest.Colour, opt => opt.Ignore());
 
         }
     }
