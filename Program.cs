@@ -74,6 +74,8 @@ builder.Services.AddScoped<IGradeRepository, GradeRepository>();
 builder.Services.AddScoped<IGradeService, GradeService>();
 builder.Services.AddScoped<IColourRepository, ColourRepository>();
 builder.Services.AddScoped<IColourService, ColourService>();
+builder.Services.AddScoped<IUnitOfMeasurementRepository, UnitOfMeasurementRepository>();
+builder.Services.AddScoped<IUnitOfMeasurementService, UnitOfMeasurementService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
@@ -178,6 +180,9 @@ using (var scope = app.Services.CreateScope())
         "alter_m_formula_chemical_transaction_add_mixture_name.sql",
         "alter_m_mixtureform_add_mixture_name.sql",
         "alter_m_chemical_inword_add_attached_file.sql",
+        "create_m_unit_of_measurement.sql",
+        "alter_m_chemical_inword_add_unit_of_measurement.sql",
+        "seed_unit_of_measurement_menu.sql",
         "alter_m_pvc_inward_add_dimensions.sql",
         "alter_m_fabric_inward_add_dimensions.sql",
         "alter_m_fabric_inward_add_attached_file.sql",
@@ -233,6 +238,7 @@ app.MapEnquiryEndpoints();
 app.MapChemicalEndpoints();
 app.MapGradeEndpoints();
 app.MapColourEndpoints();
+app.MapUnitOfMeasurementEndpoints();
 app.MapCustomerEndpoints();
 app.MapSupplierEndpoints();
 app.MapGramageEndpoints();

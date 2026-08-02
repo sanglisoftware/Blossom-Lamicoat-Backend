@@ -27,6 +27,7 @@ namespace Api.Infrastructure.Data
         public DbSet<Chemical> Chemical { get; set; }
         public DbSet<Grade> Grade { get; set; }
         public DbSet<Colour> Colour { get; set; }
+        public DbSet<UnitOfMeasurement> UnitOfMeasurements { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Supplier> Supplier { get; set; }
         public DbSet<Gramage> Gramage { get; set; }
@@ -385,6 +386,24 @@ namespace Api.Infrastructure.Data
                     .HasColumnName("name")
                     .HasMaxLength(200)
                     .IsUnicode(true);
+
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+            });
+
+            modelBuilder.Entity<UnitOfMeasurement>(entity =>
+            {
+                entity.ToTable("m_unit_of_measurement");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+
+                entity
+                    .Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(100)
+                    .IsUnicode(true)
+                    .IsRequired();
 
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
             });
@@ -798,6 +817,8 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Qty).HasColumnName("qty");
 
+                entity.Property(e => e.UnitOfMeasurementId).HasColumnName("unit_of_measurement_id");
+
                 entity.Property(e => e.SupplierMasterId).HasColumnName("supplier_master_id");
 
                 entity.Property(e => e.BatchNo).HasColumnName("batch_no");
@@ -817,6 +838,11 @@ namespace Api.Infrastructure.Data
                 entity.HasOne(e => e.Supplier).WithMany(s => s.supplierInwards).HasForeignKey(e => e.SupplierMasterId);
 
                        entity.HasOne(e => e.Chemical).WithMany(c => c.chemicalInwards).HasForeignKey(e => e.ChemicalMasterId);
+
+                entity.HasOne(e => e.UnitOfMeasurement)
+                    .WithMany(u => u.ChemicalInwards)
+                    .HasForeignKey(e => e.UnitOfMeasurementId)
+                    .HasConstraintName("FK_m_chemical_inword_m_unit_of_measurement");
 
             });
 

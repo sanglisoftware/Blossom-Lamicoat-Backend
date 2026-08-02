@@ -8,6 +8,8 @@ public class ChemicalInwardDto
 
     public double Qty { get; set; }
 
+    public int? UnitOfMeasurementId { get; set; }
+
     public int SupplierMasterId { get; set; }
 
     public double BatchNo { get; set; }
@@ -23,5 +25,7 @@ public class ChemicalInwardDto
     public string? ChemicalMasterName { get; set; }
 
      public string? SupplierMasterName { get; set; }
+
+    public string? UnitOfMeasurementName { get; set; }
 
 }

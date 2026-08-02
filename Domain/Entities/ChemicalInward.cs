@@ -8,6 +8,8 @@ namespace Api.Domain.Entities
 
         public double Qty { get; set; }
 
+        public int? UnitOfMeasurementId { get; set; }
+
         public int SupplierMasterId { get; set; }
 
         public double BatchNo { get; set; }
@@ -23,6 +25,8 @@ namespace Api.Domain.Entities
         public Chemical? Chemical { get; set; }
 
         public Supplier? Supplier { get; set; }
+
+        public UnitOfMeasurement? UnitOfMeasurement { get; set; }
 
     }
 }

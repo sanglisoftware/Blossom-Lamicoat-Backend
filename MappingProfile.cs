@@ -42,6 +42,7 @@ namespace Api
             CreateMap<Chemical, ChemicalDto>().ReverseMap();
             CreateMap<Grade, GradeDto>().ReverseMap();
             CreateMap<Colour, ColourDto>().ReverseMap();
+            CreateMap<UnitOfMeasurement, UnitOfMeasurementDto>().ReverseMap();
             CreateMap<Customer, CustomerDto>().ReverseMap();
             CreateMap<Supplier, SupplierDto>().ReverseMap();
             CreateMap<Gramage, GramageDto>().ReverseMap();
@@ -83,9 +84,12 @@ namespace Api
          opt => opt.MapFrom(src => src.Chemical != null ? src.Chemical.Name : null))
      .ForMember(dest => dest.SupplierMasterName,
          opt => opt.MapFrom(src => src.Supplier != null ? src.Supplier.Name : null))
+     .ForMember(dest => dest.UnitOfMeasurementName,
+         opt => opt.MapFrom(src => src.UnitOfMeasurement != null ? src.UnitOfMeasurement.Name : null))
      .ReverseMap()
      .ForMember(dest => dest.Chemical, opt => opt.Ignore())
-     .ForMember(dest => dest.Supplier, opt => opt.Ignore());
+     .ForMember(dest => dest.Supplier, opt => opt.Ignore())
+     .ForMember(dest => dest.UnitOfMeasurement, opt => opt.Ignore());
             ;
 
             CreateMap<PVCInward, PVCInwardDto>()

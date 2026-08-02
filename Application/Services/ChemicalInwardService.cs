@@ -31,7 +31,8 @@ public class ChemicalInwardService(IChemicalInwardRepository _repository, IMappe
             {
                 Expression<Func<ChemicalInward, bool>> termPred = ci =>
                     (ci.Chemical != null && EF.Functions.Like(ci.Chemical.Name, "%" + term + "%")) ||
-                    (ci.Supplier != null && EF.Functions.Like(ci.Supplier.Name, "%" + term + "%"));
+                    (ci.Supplier != null && EF.Functions.Like(ci.Supplier.Name, "%" + term + "%")) ||
+                    (ci.UnitOfMeasurement != null && EF.Functions.Like(ci.UnitOfMeasurement.Name, "%" + term + "%"));
 
                 relatedPredicate = SearchHelper.CombineOr(relatedPredicate, termPred);
             }
@@ -61,7 +62,9 @@ public class ChemicalInwardService(IChemicalInwardRepository _repository, IMappe
 
     public async Task<ChemicalInwardDto?> GetByIdAsync(int id)
     {
-        var chemicalInward = await _context.ChemicalInward.FirstOrDefaultAsync(e => e.Id == id);
+        var chemicalInward = await _context.ChemicalInward
+            .Include(e => e.UnitOfMeasurement)
+            .FirstOrDefaultAsync(e => e.Id == id);
         if (chemicalInward == null) return null;
 
         return new ChemicalInwardDto
@@ -69,11 +72,13 @@ public class ChemicalInwardService(IChemicalInwardRepository _repository, IMappe
             Id = chemicalInward.Id,
             ChemicalMasterId = chemicalInward.ChemicalMasterId,
             Qty = chemicalInward.Qty,
+            UnitOfMeasurementId = chemicalInward.UnitOfMeasurementId,
             SupplierMasterId = chemicalInward.SupplierMasterId,
             BatchNo = chemicalInward.BatchNo,
             BillDate = chemicalInward.BillDate,
             ReceivedDate = chemicalInward.ReceivedDate,
             AttachedFile = chemicalInward.AttachedFile,
+            UnitOfMeasurementName = chemicalInward.UnitOfMeasurement?.Name,
             // ChemicalMasterName = chemicalInward.Name,
             // SupplierMasterName = chemicalInward.SupplierMaster.Name,
         };

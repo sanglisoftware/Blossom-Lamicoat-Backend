@@ -18,13 +18,17 @@ public class ChemicalInwardRepository
     {
         return _context.ChemicalInward
             .Include(x => x.Chemical)
-            .Include(x => x.Supplier);
+            .Include(x => x.Supplier)
+            .Include(x => x.UnitOfMeasurement);
                
     }
 
     public async Task<ChemicalInward?> GetByIdAsync(int id)
     {
         return await _context.ChemicalInward
+            .Include(x => x.Chemical)
+            .Include(x => x.Supplier)
+            .Include(x => x.UnitOfMeasurement)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
