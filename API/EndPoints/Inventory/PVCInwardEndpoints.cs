@@ -41,7 +41,7 @@ namespace Api.API.EndPoints.Inventory
             {
                 var pvcInward = await service.GetByIdAsync(id);
                 return pvcInward is null ? Results.NotFound() : Results.Ok(pvcInward);
-            });
+            }).DisableAntiforgery();
 
             // POST create new PVCInward
             
@@ -50,7 +50,7 @@ namespace Api.API.EndPoints.Inventory
                     [FromForm] int supplierMasterId,
                     [FromForm] int pvcMasterId,
                     [FromForm] string new_RollNo,
-                    [FromForm] double batchNo,
+                    [FromForm] string batchNo,
                     [FromForm] double qty_kg,
                     [FromForm] double qty_Mtr,
                     [FromForm] string comments,
@@ -96,7 +96,7 @@ namespace Api.API.EndPoints.Inventory
                 {
                     return Results.Problem(ex.Message);
                 }
-            });
+            }).DisableAntiforgery();
 
             // PUT update PVCInward
             group.MapPut("/{id:int}", async (
@@ -105,7 +105,7 @@ namespace Api.API.EndPoints.Inventory
                 [FromForm] int supplierMasterId,
                 [FromForm] int pvcMasterId,
                 [FromForm] string new_RollNo,
-                [FromForm] double batchNo,
+                [FromForm] string batchNo,
                 [FromForm] double qty_kg,
                 [FromForm] double qty_Mtr,
                 [FromForm] string comments,

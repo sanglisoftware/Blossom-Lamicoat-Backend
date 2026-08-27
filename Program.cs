@@ -183,6 +183,8 @@ using (var scope = app.Services.CreateScope())
         "create_m_unit_of_measurement.sql",
         "alter_m_chemical_inword_add_unit_of_measurement.sql",
         "seed_unit_of_measurement_menu.sql",
+        "alter_m_pvc_inward_batch_no_to_text.sql",
+        "remove_separate_pvc_inward_menu.sql",
         "alter_m_pvc_inward_add_dimensions.sql",
         "alter_m_fabric_inward_add_dimensions.sql",
         "alter_m_fabric_inward_add_attached_file.sql",

@@ -10,7 +10,7 @@ namespace Api.Domain.Entities
    
         public string? New_RollNo { get; set; }
 
-        public double BatchNo { get; set; }
+        public string BatchNo { get; set; } = string.Empty;
 
         public double Qty_kg { get; set; }
 

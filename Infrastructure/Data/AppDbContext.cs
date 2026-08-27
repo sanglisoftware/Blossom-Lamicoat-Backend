@@ -796,7 +796,9 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
                 entity.Property(e => e.ProductName).HasColumnName("product_name");
-                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+                entity.Property(e => e.BatchNo)
+                    .HasColumnName("batch_no")
+                    .HasMaxLength(100);
                 entity.Property(e => e.RollMtr).HasColumnName("roll_mtr");
                 entity.Property(e => e.DefectMtr).HasColumnName("defect_mtr");
                 entity.Property(e => e.CheckerName).HasColumnName("checker_name");
