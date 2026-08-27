@@ -821,7 +821,9 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.SupplierMasterId).HasColumnName("supplier_master_id");
 
-                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+                entity.Property(e => e.BatchNo)
+                    .HasColumnName("batch_no")
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.BillDate).HasColumnName("bill_date");
 

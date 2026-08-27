@@ -12,7 +12,7 @@ public class ChemicalInwardDto
 
     public int SupplierMasterId { get; set; }
 
-    public double BatchNo { get; set; }
+    public string BatchNo { get; set; } = string.Empty;
 
     public DateTime BillDate { get; set; }
 
