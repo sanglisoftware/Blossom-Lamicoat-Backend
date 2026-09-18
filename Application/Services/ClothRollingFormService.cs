@@ -86,26 +86,50 @@ public class ClothRollingFormService(
             throw new ArgumentException("Defect MTR cannot be negative");
         }
 
+        if (dto.DefectMtr > dto.RollMtr)
+        {
+            throw new ArgumentException("Defect MTR cannot be greater than actual roll MTR");
+        }
+
+        if (!dto.FabricInwardId.HasValue || dto.FabricInwardId <= 0)
+        {
+            throw new ArgumentException("Select a fabric inward batch");
+        }
+
         var productName = dto.ProductName.Trim();
         var batchNo = dto.BatchNo.Trim();
         var checkerName = dto.CheckerName.Trim();
 
-        var fabricInwardExists = await _context.FabricInward
+        var fabricInward = await _context.FabricInward
             .Include(x => x.Fabric)
-            .AnyAsync(x =>
-                x.Fabric != null
+            .FirstOrDefaultAsync(x =>
+                x.Id == dto.FabricInwardId.Value
+                && (x.IsActive == null || x.IsActive == 1)
+                && x.Fabric != null
                 && x.Fabric.Name == productName
-                && x.BatchNo.ToString() == batchNo
+                && x.BatchNo == batchNo
             );
 
-        if (!fabricInwardExists)
+        if (fabricInward == null)
         {
             throw new ArgumentException("Selected product and batch no were not found in fabric inward");
         }
 
+        var alreadyProcessedMtr = await _context.ClothRollingForms
+            .Where(x => x.FabricInwardId == fabricInward.Id && (x.IsActive == null || x.IsActive == 1))
+            .SumAsync(x => x.RollMtr + x.DefectMtr);
+
+        if (alreadyProcessedMtr >= (decimal)fabricInward.QtyMTR)
+        {
+            throw new ArgumentException("All inward MTR for this batch has already been rolled");
+        }
+
+        var nextRollSequence = (await _context.ClothRollingForms.MaxAsync(x => (int?)x.Id) ?? 0) + 1;
         var clothRollingForm = _mapper.Map<ClothRollingForm>(dto);
         clothRollingForm.ProductName = productName;
         clothRollingForm.BatchNo = batchNo;
+        clothRollingForm.FabricInwardId = fabricInward.Id;
+        clothRollingForm.RollNo = $"R-{DateTime.Now:ddMMyyyy}-{nextRollSequence:D5}";
         clothRollingForm.CheckerName = checkerName;
         clothRollingForm.CreatedDate = dto.CreatedDate ?? DateTime.UtcNow;
         clothRollingForm.IsActive = dto.IsActive ?? 1;
@@ -120,7 +144,11 @@ public class ClothRollingFormService(
         new()
         {
             Id = clothRollingForm.Id,
+            FabricInwardId = clothRollingForm.FabricInwardId,
+            RollNo = clothRollingForm.RollNo,
             ProductName = clothRollingForm.ProductName,
+            Gramage = clothRollingForm.FabricInward?.FGramage?.GRM ?? string.Empty,
+            Colour = clothRollingForm.FabricInward?.Colour?.Name ?? string.Empty,
             BatchNo = clothRollingForm.BatchNo,
             RollMtr = clothRollingForm.RollMtr,
             DefectMtr = clothRollingForm.DefectMtr,

@@ -76,17 +76,63 @@ public static class StockManagementEndpoints
                 };
             }).ToList();
 
-            var fabricStock = await db.FabricInward.AsNoTracking()
+            var fabricInwards = await db.FabricInward.AsNoTracking()
                 .Where(x => x.IsActive == null || x.IsActive == 1)
-                .GroupBy(x => new { x.FabricMasterId, Name = x.Fabric != null ? x.Fabric.Name : string.Empty })
-                .Select(x => new RawMaterialStockDto
+                .Select(x => new
                 {
-                    MasterId = x.Key.FabricMasterId,
-                    Name = x.Key.Name,
-                    Unit = "MTR",
-                    Received = x.Sum(v => v.QtyMTR),
-                    Balance = x.Sum(v => v.QtyMTR)
-                }).OrderBy(x => x.Name).ToListAsync();
+                    x.Id,
+                    x.FabricMasterId,
+                    x.FGramageMasterId,
+                    x.ColourMasterId,
+                    Name = x.Fabric != null ? x.Fabric.Name : string.Empty,
+                    Gramage = x.FGramage != null ? x.FGramage.GRM : string.Empty,
+                    Colour = x.Colour != null ? x.Colour.Name : string.Empty,
+                    x.QtyMTR
+                })
+                .ToListAsync();
+            var rolling = await db.ClothRollingForms.AsNoTracking()
+                .Where(x => x.IsActive == null || x.IsActive == 1)
+                .Select(x => new { x.FabricInwardId, x.RollMtr, x.DefectMtr })
+                .ToListAsync();
+            var fabricReturns = await db.FabricStockReturns.AsNoTracking()
+                .Where(x => x.IsActive == null || x.IsActive == 1)
+                .Select(x => new { x.FabricInwardId, x.QtyMtr })
+                .ToListAsync();
+
+            var fabricStock = fabricInwards
+                .GroupBy(x => new
+                {
+                    x.FabricMasterId,
+                    x.FGramageMasterId,
+                    x.ColourMasterId,
+                    x.Name,
+                    x.Gramage,
+                    x.Colour
+                })
+                .Select(group =>
+                {
+                    var inwardIds = group.Select(x => x.Id).ToHashSet();
+                    var relevantRolls = rolling.Where(x => x.FabricInwardId.HasValue && inwardIds.Contains(x.FabricInwardId.Value)).ToList();
+                    var received = group.Sum(x => x.QtyMTR);
+                    var actual = relevantRolls.Sum(x => (double)x.RollMtr);
+                    var defective = relevantRolls.Sum(x => (double)x.DefectMtr);
+                    var returned = fabricReturns.Where(x => inwardIds.Contains(x.FabricInwardId)).Sum(x => x.QtyMtr);
+                    return new RawMaterialStockDto
+                    {
+                        MasterId = group.Key.FabricMasterId,
+                        Name = group.Key.Name,
+                        Unit = "MTR",
+                        Gramage = group.Key.Gramage,
+                        Colour = group.Key.Colour,
+                        Received = received,
+                        Actual = actual,
+                        Defective = defective,
+                        Variance = actual + defective - received,
+                        Used = actual + defective,
+                        Returned = returned,
+                        Balance = received - actual - defective - returned
+                    };
+                }).OrderBy(x => x.Name).ToList();
 
             var pvcStock = await db.PVCInward.AsNoTracking()
                 .Where(x => x.IsActive == null || x.IsActive == 1)
@@ -126,6 +172,34 @@ public static class StockManagementEndpoints
             db.ChemicalStockReturns.Add(entity);
             await db.SaveChangesAsync();
             return Results.Created($"/api/stock-management/chemical-returns/{entity.Id}", new { entity.Id });
+        });
+
+        group.MapPost("/fabric-returns", async (CreateFabricStockReturnDto dto, AppDbContext db) =>
+        {
+            var inward = await db.FabricInward.FirstOrDefaultAsync(x =>
+                x.Id == dto.FabricInwardId && (x.IsActive == null || x.IsActive == 1));
+            if (inward == null)
+                return Results.BadRequest("Select a valid fabric inward batch.");
+            if (dto.QtyMtr <= 0)
+                return Results.BadRequest("Return MTR must be greater than zero.");
+
+            var alreadyReturned = await db.FabricStockReturns
+                .Where(x => x.FabricInwardId == inward.Id && (x.IsActive == null || x.IsActive == 1))
+                .SumAsync(x => x.QtyMtr);
+            if (alreadyReturned + dto.QtyMtr > inward.QtyMTR)
+                return Results.BadRequest("Total returned MTR cannot exceed inward MTR.");
+
+            var entity = new FabricStockReturn
+            {
+                FabricInwardId = inward.Id,
+                QtyMtr = dto.QtyMtr,
+                ReturnDate = dto.ReturnDate ?? DateTime.UtcNow,
+                Remarks = dto.Remarks?.Trim(),
+                IsActive = 1
+            };
+            db.FabricStockReturns.Add(entity);
+            await db.SaveChangesAsync();
+            return Results.Created($"/api/stock-management/fabric-returns/{entity.Id}", new { entity.Id });
         });
     }
 }

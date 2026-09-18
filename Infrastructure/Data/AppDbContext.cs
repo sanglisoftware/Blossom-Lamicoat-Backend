@@ -49,6 +49,7 @@ namespace Api.Infrastructure.Data
         public DbSet<PVCInward> PVCInward { get; set; }
         public DbSet<FabricInward> FabricInward { get; set; }
         public DbSet<ChemicalStockReturn> ChemicalStockReturns { get; set; }
+        public DbSet<FabricStockReturn> FabricStockReturns { get; set; }
 
 
 
@@ -796,15 +797,19 @@ namespace Api.Infrastructure.Data
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.FabricInwardId).HasColumnName("fabric_inward_id");
+                entity.Property(e => e.RollNo).HasColumnName("roll_no").HasMaxLength(100);
                 entity.Property(e => e.ProductName).HasColumnName("product_name");
                 entity.Property(e => e.BatchNo)
                     .HasColumnName("batch_no")
                     .HasMaxLength(100);
-                entity.Property(e => e.RollMtr).HasColumnName("roll_mtr");
-                entity.Property(e => e.DefectMtr).HasColumnName("defect_mtr");
+                entity.Property(e => e.RollMtr).HasColumnName("roll_mtr").HasPrecision(18, 2);
+                entity.Property(e => e.DefectMtr).HasColumnName("defect_mtr").HasPrecision(18, 2);
                 entity.Property(e => e.CheckerName).HasColumnName("checker_name");
                 entity.Property(e => e.IsActive).HasColumnName("is_active");
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+                entity.HasIndex(e => e.RollNo).IsUnique();
+                entity.HasOne(e => e.FabricInward).WithMany().HasForeignKey(e => e.FabricInwardId);
             });
             
 
@@ -865,6 +870,19 @@ namespace Api.Infrastructure.Data
                 entity.HasOne(e => e.Chemical)
                     .WithMany(e => e.StockReturns)
                     .HasForeignKey(e => e.ChemicalMasterId);
+            });
+
+            modelBuilder.Entity<FabricStockReturn>(entity =>
+            {
+                entity.ToTable("m_fabric_stock_return");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.FabricInwardId).HasColumnName("fabric_inward_id");
+                entity.Property(e => e.QtyMtr).HasColumnName("qty_mtr");
+                entity.Property(e => e.ReturnDate).HasColumnName("return_date");
+                entity.Property(e => e.Remarks).HasColumnName("remarks").HasMaxLength(500);
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.HasOne(e => e.FabricInward).WithMany().HasForeignKey(e => e.FabricInwardId);
             });
 
               modelBuilder.Entity<PVCInward>(entity =>

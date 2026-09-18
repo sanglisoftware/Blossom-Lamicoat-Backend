@@ -7,17 +7,11 @@ namespace Api.Infrastructure.Repositories;
 public class ClothRollingFormRepository(AppDbContext _context) : IClothRollingFormRepository
 {
     public IQueryable<ClothRollingForm> Query() =>
-        _context.ClothRollingForms.Select(x => new ClothRollingForm
-        {
-            Id = x.Id,
-            ProductName = x.ProductName,
-            BatchNo = x.BatchNo,
-            RollMtr = x.RollMtr,
-            DefectMtr = x.DefectMtr,
-            CheckerName = x.CheckerName,
-            IsActive = x.IsActive,
-            CreatedDate = x.CreatedDate,
-        });
+        _context.ClothRollingForms
+            .Include(x => x.FabricInward)
+                .ThenInclude(x => x!.FGramage)
+            .Include(x => x.FabricInward)
+                .ThenInclude(x => x!.Colour);
 
     public async Task<ClothRollingForm?> GetByIdAsync(int id) =>
         await Query().FirstOrDefaultAsync(x => x.Id == id);
