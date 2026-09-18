@@ -865,7 +865,9 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.New_RollNo).HasColumnName("new_rollno");
 
-                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+                entity.Property(e => e.BatchNo)
+                    .HasColumnName("batch_no")
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Qty_kg).HasColumnName("qty_kg");
 
@@ -914,7 +916,9 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.ColourMasterId).HasColumnName("colourmasterid");
 
-                entity.Property(e => e.BatchNo).HasColumnName("batch_no");
+                entity.Property(e => e.BatchNo)
+                    .HasColumnName("batch_no")
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.QtyMTR).HasColumnName("qty_mtr");
 

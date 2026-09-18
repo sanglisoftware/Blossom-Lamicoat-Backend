@@ -12,7 +12,7 @@ public class FabricInwardDto
 
     public int? ColourMasterId { get; set; }
 
-    public double BatchNo { get; set; }
+    public string BatchNo { get; set; } = string.Empty;
 
     public double QtyMTR { get; set; }
 

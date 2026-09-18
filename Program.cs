@@ -188,6 +188,7 @@ using (var scope = app.Services.CreateScope())
         "alter_m_pvc_inward_add_dimensions.sql",
         "alter_m_pvc_inward_remove_qty_mtr_and_width.sql",
         "alter_m_fabric_inward_add_dimensions.sql",
+        "alter_m_fabric_inward_batch_no_to_text.sql",
         "alter_m_fabric_inward_add_attached_file.sql",
     };
 

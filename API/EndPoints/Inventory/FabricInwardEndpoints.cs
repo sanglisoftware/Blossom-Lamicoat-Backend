@@ -171,12 +171,12 @@ namespace Api.API.EndPoints.Inventory
             var form = await httpContext.Request.ReadFormAsync();
             var dtoFromForm = new FabricInwardDto
             {
-                Id = id ?? ParseRequiredInt(form, "id"),
+                Id = id ?? 0,
                 SupplierMasterId = ParseRequiredInt(form, "supplierMasterId"),
                 FabricMasterId = ParseRequiredInt(form, "fabricMasterId"),
                 FGramageMasterId = ParseNullableInt(form, "fGramageMasterId"),
                 ColourMasterId = ParseNullableInt(form, "colourMasterId"),
-                BatchNo = ParseRequiredDouble(form, "batchNo"),
+                BatchNo = ParseRequiredString(form, "batchNo"),
                 QtyMTR = ParseRequiredDouble(form, "qtyMTR"),
                 Comments = form["comments"].ToString(),
                 IsActive = ParseNullableShort(form, "isActive"),
@@ -215,6 +215,17 @@ namespace Api.API.EndPoints.Inventory
             return value;
         }
 
+        private static string ParseRequiredString(IFormCollection form, string key)
+        {
+            var value = form[key].ToString().Trim();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new BadHttpRequestException($"{key} is required.");
+            }
+
+            return value;
+        }
+
         private static short? ParseNullableShort(IFormCollection form, string key)
         {
             var rawValue = form[key].ToString();
@@ -228,8 +239,12 @@ namespace Api.API.EndPoints.Inventory
                 return null;
             }
 
+            var environment = httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>();
+            var webRootPath = environment.WebRootPath
+                ?? Path.Combine(environment.ContentRootPath, "wwwroot");
+
             var uploadsFolder = Path.Combine(
-                httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().WebRootPath,
+                webRootPath,
                 "uploads",
                 "fabricinward"
             );

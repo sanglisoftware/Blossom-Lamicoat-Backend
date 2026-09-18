@@ -7,7 +7,7 @@ namespace Api.Domain.Entities
         public int FabricMasterId { get; set; }
         public int? FGramageMasterId { get; set; }
         public int? ColourMasterId { get; set; }
-        public double BatchNo { get; set; }
+        public string BatchNo { get; set; } = string.Empty;
         public double QtyMTR { get; set; }
         public string Comments { get; set; } = string.Empty;
         public string? AttachedFile { get; set; }
