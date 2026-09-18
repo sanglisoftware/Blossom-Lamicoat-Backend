@@ -1,29 +1,36 @@
 {
   "format": 1,
   "restore": {
-    "/home/user/Desktop/Sanglisoftware/Blossom-Lamicoat-Backend/Api.csproj": {}
+    "C:\\SangliSoftware\\BLOSSOM\\Blossom-Lamicoat-Backend\\Api.csproj": {}
   },
   "projects": {
-    "/home/user/Desktop/Sanglisoftware/Blossom-Lamicoat-Backend/Api.csproj": {
+    "C:\\SangliSoftware\\BLOSSOM\\Blossom-Lamicoat-Backend\\Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/user/Desktop/Sanglisoftware/Blossom-Lamicoat-Backend/Api.csproj",
+        "projectUniqueName": "C:\\SangliSoftware\\BLOSSOM\\Blossom-Lamicoat-Backend\\Api.csproj",
         "projectName": "Api",
-        "projectPath": "/home/user/Desktop/Sanglisoftware/Blossom-Lamicoat-Backend/Api.csproj",
-        "packagesPath": "/home/user/.nuget/packages/",
-        "outputPath": "/home/user/Desktop/Sanglisoftware/Blossom-Lamicoat-Backend/obj/",
+        "projectPath": "C:\\SangliSoftware\\BLOSSOM\\Blossom-Lamicoat-Backend\\Api.csproj",
+        "packagesPath": "C:\\Users\\mujaf\\.nuget\\packages\\",
+        "outputPath": "C:\\SangliSoftware\\BLOSSOM\\Blossom-Lamicoat-Backend\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/user/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\mujaf\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -32,10 +39,17 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "AutoMapper.Extensions.Microsoft.DependencyInjection": {
@@ -90,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.122/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
