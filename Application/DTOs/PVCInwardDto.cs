@@ -14,17 +14,11 @@ public class PVCInwardDto
 
     public double Qty_kg { get; set; }
 
-    public double Qty_Mtr { get; set; }
-
     public string? Comments { get; set; }
 
     public int? GramageMasterId { get; set; }
 
     public string? GramageName { get; set; }
-
-    public int? WidthMasterId { get; set; }
-
-    public string? WidthName { get; set; }
 
     public int? ColourMasterId { get; set; }
 

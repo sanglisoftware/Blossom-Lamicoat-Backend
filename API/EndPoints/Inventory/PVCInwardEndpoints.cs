@@ -52,12 +52,9 @@ namespace Api.API.EndPoints.Inventory
                     [FromForm] string new_RollNo,
                     [FromForm] string batchNo,
                     [FromForm] double qty_kg,
-                    [FromForm] double qty_Mtr,
                     [FromForm] string comments,
                     [FromForm] int? gramageMasterId,
                     [FromForm] string? gramageName,
-                    [FromForm] int? widthMasterId,
-                    [FromForm] string? widthName,
                     [FromForm] int? colourMasterId,
                     [FromForm] string? colourName,
                     [FromForm] DateTime? billDate,
@@ -75,12 +72,9 @@ namespace Api.API.EndPoints.Inventory
                         New_RollNo = new_RollNo,
                         BatchNo = batchNo,
                         Qty_kg = qty_kg,
-                        Qty_Mtr = qty_Mtr,
                         Comments = comments,
                         GramageMasterId = gramageMasterId,
                         GramageName = gramageName,
-                        WidthMasterId = widthMasterId,
-                        WidthName = widthName,
                         ColourMasterId = colourMasterId,
                         ColourName = colourName,
                         BillDate = billDate,
@@ -107,12 +101,9 @@ namespace Api.API.EndPoints.Inventory
                 [FromForm] string new_RollNo,
                 [FromForm] string batchNo,
                 [FromForm] double qty_kg,
-                [FromForm] double qty_Mtr,
                 [FromForm] string comments,
                 [FromForm] int? gramageMasterId,
                 [FromForm] string? gramageName,
-                [FromForm] int? widthMasterId,
-                [FromForm] string? widthName,
                 [FromForm] int? colourMasterId,
                 [FromForm] string? colourName,
                 [FromForm] DateTime? billDate,
@@ -120,7 +111,8 @@ namespace Api.API.EndPoints.Inventory
                 [FromForm] short? isActive,
                 [FromForm] string? existingAttachedFile,
                 IFormFile? attachedFile,
-                IPVCInwardService service) =>
+                IPVCInwardService service,
+                ILoggerFactory loggerFactory) =>
             {
                 try
                 {
@@ -132,12 +124,9 @@ namespace Api.API.EndPoints.Inventory
                         New_RollNo = new_RollNo,
                         BatchNo = batchNo,
                         Qty_kg = qty_kg,
-                        Qty_Mtr = qty_Mtr,
                         Comments = comments,
                         GramageMasterId = gramageMasterId,
                         GramageName = gramageName,
-                        WidthMasterId = widthMasterId,
-                        WidthName = widthName,
                         ColourMasterId = colourMasterId,
                         ColourName = colourName,
                         BillDate = billDate,
@@ -151,9 +140,16 @@ namespace Api.API.EndPoints.Inventory
                 }
                 catch (Exception ex)
                 {
-                    return Results.Problem("Username Alredy Exist" + ex.Message);
+                    var logger = loggerFactory.CreateLogger("PVCInwardEndpoints");
+                    logger.LogError(ex, "Failed to update PVC inward {PVCInwardId}", id);
+
+                    return Results.Problem(
+                        title: "Failed to update PVC inward",
+                        detail: ex.InnerException?.Message ?? ex.Message,
+                        statusCode: StatusCodes.Status500InternalServerError
+                    );
                 }
-            });
+            }).DisableAntiforgery();
 
             // DELETE PVCInward
             group.MapDelete("/{id:int}", async (int id, IPVCInwardService service) =>

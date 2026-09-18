@@ -869,17 +869,11 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Qty_kg).HasColumnName("qty_kg");
 
-                entity.Property(e => e.Qty_Mtr).HasColumnName("qty_mtr");
-
                 entity.Property(e => e.Comments).HasColumnName("comments");
 
                 entity.Property(e => e.GramageMasterId).HasColumnName("gramage_master_id");
 
                 entity.Property(e => e.GramageName).HasColumnName("gramage_name");
-
-                entity.Property(e => e.WidthMasterId).HasColumnName("width_master_id");
-
-                entity.Property(e => e.WidthName).HasColumnName("width_name");
 
                 entity.Property(e => e.ColourMasterId).HasColumnName("colour_master_id");
 

@@ -13,16 +13,6 @@ BEGIN
     ALTER TABLE dbo.m_pvc_inward ADD gramage_name NVARCHAR(200) NOT NULL CONSTRAINT DF_m_pvc_inward_gramage_name DEFAULT '';
 END
 
-IF COL_LENGTH('dbo.m_pvc_inward', 'width_master_id') IS NULL
-BEGIN
-    ALTER TABLE dbo.m_pvc_inward ADD width_master_id INT NULL;
-END
-
-IF COL_LENGTH('dbo.m_pvc_inward', 'width_name') IS NULL
-BEGIN
-    ALTER TABLE dbo.m_pvc_inward ADD width_name NVARCHAR(200) NOT NULL CONSTRAINT DF_m_pvc_inward_width_name DEFAULT '';
-END
-
 IF COL_LENGTH('dbo.m_pvc_inward', 'colour_master_id') IS NULL
 BEGIN
     ALTER TABLE dbo.m_pvc_inward ADD colour_master_id INT NULL;
