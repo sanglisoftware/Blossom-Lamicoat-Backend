@@ -1,7 +1,10 @@
 using System.Text.RegularExpressions;
 using Api.Application.DTOs;
 using Api.Application.Interfaces;
+using Api.Domain.Entities;
+using Api.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.API.EndPoints.Inventory
 {
@@ -10,6 +13,55 @@ namespace Api.API.EndPoints.Inventory
         public static void MapFormulaMasterEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/formulamaster").RequireAuthorization();
+
+            group.MapGet("/finished-goods", async (AppDbContext db) =>
+            {
+                var combinations = await db.Quality.AsNoTracking()
+                    .Where(x => x.IsActive == null || x.IsActive == 1)
+                    .Select(x => new
+                    {
+                        Quality = x.Name,
+                        Colour = x.Colour != null ? x.Colour.Name : string.Empty
+                    })
+                    .Distinct()
+                    .OrderBy(x => x.Quality)
+                    .ThenBy(x => x.Colour)
+                    .ToListAsync();
+
+                var finalProducts = await db.FinalProduct.ToListAsync();
+                var changed = false;
+                foreach (var combination in combinations)
+                {
+                    var label = $"{combination.Quality} - {combination.Colour}".Trim(' ', '-');
+                    if (finalProducts.Any(x => x.Final_Product == label)) continue;
+
+                    var product = new FinalProduct
+                    {
+                        Final_Product = label,
+                        IsActive = 1
+                    };
+                    db.FinalProduct.Add(product);
+                    finalProducts.Add(product);
+                    changed = true;
+                }
+
+                if (changed) await db.SaveChangesAsync();
+
+                var result = combinations.Select(combination =>
+                {
+                    var label = $"{combination.Quality} - {combination.Colour}".Trim(' ', '-');
+                    var product = finalProducts.First(x => x.Final_Product == label);
+                    return new
+                    {
+                        Id = product.Id,
+                        FinalProduct = label,
+                        combination.Quality,
+                        combination.Colour
+                    };
+                });
+
+                return Results.Ok(result);
+            });
 
             // GET all FormulaMaster
             group.MapGet("/", async (HttpRequest req, IFormulaMasterService service) =>

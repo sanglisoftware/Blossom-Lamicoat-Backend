@@ -182,11 +182,16 @@ public class FormulaChemicalTransactionService(
     // 2️⃣ Implement UpdateFormulaAsync
     public async Task<FormulaDetailsDto?> UpdateFormulaAsync(FormulaDetailsDto dto)
     {
+        var formula = await _context.FormulaMaster.FindAsync(dto.FormulaMasterId);
+        if (formula == null) return null;
+
         var existingChemicals = await _repository.Query()
             .Where(c => c.FormulaMasterId == dto.FormulaMasterId)
             .ToListAsync();
 
-        if (!existingChemicals.Any()) return null;
+        var requestedIds = dto.Chemicals.Select(x => x.ChemicalMasterId).ToHashSet();
+        var removed = existingChemicals.Where(x => !requestedIds.Contains(x.ChemicalMasterId)).ToList();
+        _context.FormulaChemicalTransaction.RemoveRange(removed);
 
         foreach (var chemDto in dto.Chemicals)
         {
@@ -200,16 +205,31 @@ public class FormulaChemicalTransactionService(
                     : dto.MixtureName.Trim();
                 await _repository.UpdateAsync(entity.Id, entity);
             }
+            else
+            {
+                _context.FormulaChemicalTransaction.Add(new FormulaChemicalTransaction
+                {
+                    FormulaMasterId = dto.FormulaMasterId,
+                    ChemicalMasterId = chemDto.ChemicalMasterId,
+                    Qty = chemDto.Qty,
+                    MixtureName = string.IsNullOrWhiteSpace(dto.MixtureName) ? string.Empty : dto.MixtureName.Trim()
+                });
+            }
         }
 
         await _context.SaveChangesAsync();
 
+        var savedChemicals = await _repository.Query()
+            .Where(c => c.FormulaMasterId == dto.FormulaMasterId)
+            .Include(c => c.Chemical)
+            .ToListAsync();
+
         return new FormulaDetailsDto
         {
             FormulaMasterId = dto.FormulaMasterId,
-            FinalProductId = existingChemicals.First().FormulaMasterId,
-            MixtureName = existingChemicals.First().FormulaMaster?.MixtureName ?? string.Empty,
-            Chemicals = existingChemicals.Select(c => new ChemicalItemDto
+            FinalProductId = formula.FinalProductId,
+            MixtureName = formula.MixtureName,
+            Chemicals = savedChemicals.Select(c => new ChemicalItemDto
             {
                 ChemicalMasterId = c.ChemicalMasterId,
                 Qty = c.Qty,
