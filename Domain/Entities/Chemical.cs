@@ -11,8 +11,11 @@ namespace Api.Domain.Entities
         public ICollection<FormulaChemicalTransaction> formulaChemicals
         { get; set; } = new List<FormulaChemicalTransaction>();  
 
-          public ICollection<ChemicalInward> chemicalInwards
-        { get; set; } = new List<ChemicalInward>();       
+        public ICollection<ChemicalInward> chemicalInwards
+        { get; set; } = new List<ChemicalInward>();
+
+        public ICollection<ChemicalStockReturn> StockReturns
+        { get; set; } = new List<ChemicalStockReturn>();
     }
 }
 

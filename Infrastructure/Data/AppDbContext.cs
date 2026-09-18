@@ -48,6 +48,7 @@ namespace Api.Infrastructure.Data
         public DbSet<ChemicalInward> ChemicalInward { get; set; }
         public DbSet<PVCInward> PVCInward { get; set; }
         public DbSet<FabricInward> FabricInward { get; set; }
+        public DbSet<ChemicalStockReturn> ChemicalStockReturns { get; set; }
 
 
 
@@ -850,6 +851,21 @@ namespace Api.Infrastructure.Data
 
             });
 
+
+            modelBuilder.Entity<ChemicalStockReturn>(entity =>
+            {
+                entity.ToTable("m_chemical_stock_return");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
+                entity.Property(e => e.ChemicalMasterId).HasColumnName("chemical_master_id");
+                entity.Property(e => e.Qty).HasColumnName("qty");
+                entity.Property(e => e.ReturnDate).HasColumnName("return_date");
+                entity.Property(e => e.Remarks).HasColumnName("remarks").HasMaxLength(500);
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+                entity.HasOne(e => e.Chemical)
+                    .WithMany(e => e.StockReturns)
+                    .HasForeignKey(e => e.ChemicalMasterId);
+            });
 
               modelBuilder.Entity<PVCInward>(entity =>
             {

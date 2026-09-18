@@ -183,6 +183,8 @@ using (var scope = app.Services.CreateScope())
         "create_m_unit_of_measurement.sql",
         "alter_m_chemical_inword_add_unit_of_measurement.sql",
         "seed_unit_of_measurement_menu.sql",
+        "create_m_chemical_stock_return.sql",
+        "seed_stock_management_menu.sql",
         "alter_m_pvc_inward_batch_no_to_text.sql",
         "remove_separate_pvc_inward_menu.sql",
         "alter_m_pvc_inward_add_dimensions.sql",
@@ -259,6 +261,7 @@ app.MapChemicalInwardEndpoints();
 app.MapPVCInwardEndpoints();
 app.MapFabricInwardEndpoints();
 app.MapInspectionFormEndpoints();
+app.MapStockManagementEndpoints();
 
 
 
