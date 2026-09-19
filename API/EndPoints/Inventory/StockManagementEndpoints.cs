@@ -76,6 +76,24 @@ public static class StockManagementEndpoints
                 };
             }).ToList();
 
+            var mixtureStock = await db.MixtureForms.AsNoTracking()
+                .GroupBy(x => new
+                {
+                    x.FormulaMasterId,
+                    MixtureName = x.MixtureName ?? x.FormulaMaster!.MixtureName,
+                    ProductName = x.FormulaMaster!.FinalProduct!.Final_Product
+                })
+                .Select(group => new RawMaterialStockDto
+                {
+                    MasterId = group.Key.FormulaMasterId,
+                    Name = group.Key.ProductName + " - " + group.Key.MixtureName,
+                    Unit = "KG",
+                    Received = group.Sum(x => (double)x.TotalMixture),
+                    Balance = group.Sum(x => (double)x.TotalMixture)
+                })
+                .OrderBy(x => x.Name)
+                .ToListAsync();
+
             var fabricInwards = await db.FabricInward.AsNoTracking()
                 .Where(x => x.IsActive == null || x.IsActive == 1)
                 .Select(x => new
@@ -149,6 +167,7 @@ public static class StockManagementEndpoints
             return Results.Ok(new StockManagementDto
             {
                 Chemicals = chemicalStock,
+                Mixtures = mixtureStock,
                 Fabrics = fabricStock,
                 PVC = pvcStock
             });

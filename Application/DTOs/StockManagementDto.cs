@@ -30,6 +30,7 @@ public class RawMaterialStockDto
 public class StockManagementDto
 {
     public List<ChemicalStockDto> Chemicals { get; set; } = [];
+    public List<RawMaterialStockDto> Mixtures { get; set; } = [];
     public List<RawMaterialStockDto> Fabrics { get; set; } = [];
     public List<RawMaterialStockDto> PVC { get; set; } = [];
 }
