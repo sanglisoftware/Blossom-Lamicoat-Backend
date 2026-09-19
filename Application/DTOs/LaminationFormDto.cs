@@ -8,9 +8,13 @@ public class LaminationFormDto
     public string ClothRollCode { get; set; } = string.Empty;
     public string ClothRollBatchNo { get; set; } = string.Empty;
     public int? PVCMasterId { get; set; }
+    public int? PVCInwardId { get; set; }
     public string PVCBatchNo { get; set; } = string.Empty;
     public decimal PVCQty { get; set; }
-    public int ChemicalId { get; set; }
+    public int? MixtureFormulaMasterId { get; set; }
+    public decimal MixtureQty { get; set; }
+    public decimal FinalProductQtyMtr { get; set; }
+    public int? ChemicalId { get; set; }
     public decimal ChemicalQty { get; set; }
     public string Bounding { get; set; } = string.Empty;
     public int WorkerId { get; set; }
@@ -19,6 +23,7 @@ public class LaminationFormDto
     public DateTime? CreatedDate { get; set; }
     public string FinalProductName { get; set; } = string.Empty;
     public string PVCName { get; set; } = string.Empty;
+    public string MixtureName { get; set; } = string.Empty;
     public string ChemicalName { get; set; } = string.Empty;
     public string WorkerName { get; set; } = string.Empty;
 }

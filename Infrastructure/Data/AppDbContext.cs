@@ -749,8 +749,12 @@ namespace Api.Infrastructure.Data
                 entity.Property(e => e.ClothRollingFormId).HasColumnName("cloth_roll_code_id");
                 entity.Property(e => e.ClothRollBatchNo).HasColumnName("cloth_roll_batch_no");
                 entity.Property(e => e.PVCMasterId).HasColumnName("pvc_master_id");
+                entity.Property(e => e.PVCInwardId).HasColumnName("pvc_inward_id");
                 entity.Property(e => e.PVCBatchNo).HasColumnName("pvc_batch_no");
                 entity.Property(e => e.PVCQty).HasColumnName("pvc_qty");
+                entity.Property(e => e.MixtureFormulaMasterId).HasColumnName("mixture_formula_master_id");
+                entity.Property(e => e.MixtureQty).HasColumnName("mixture_qty");
+                entity.Property(e => e.FinalProductQtyMtr).HasColumnName("final_product_qty_mtr");
                 entity.Property(e => e.ChemicalId).HasColumnName("chemical_id");
                 entity.Property(e => e.ChemicalQty).HasColumnName("chemical_qty");
                 entity.Property(e => e.Bounding).HasColumnName("bounding");
@@ -776,6 +780,18 @@ namespace Api.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(e => e.PVCMasterId)
                     .HasConstraintName("FK_m_laminationform_m_pvcproducttable");
+
+                entity
+                    .HasOne(e => e.PVCInward)
+                    .WithMany()
+                    .HasForeignKey(e => e.PVCInwardId)
+                    .HasConstraintName("FK_m_laminationform_m_pvc_inward");
+
+                entity
+                    .HasOne(e => e.MixtureFormulaMaster)
+                    .WithMany()
+                    .HasForeignKey(e => e.MixtureFormulaMasterId)
+                    .HasConstraintName("FK_m_laminationform_m_formula_master");
 
                 entity
                     .HasOne(e => e.Chemical)

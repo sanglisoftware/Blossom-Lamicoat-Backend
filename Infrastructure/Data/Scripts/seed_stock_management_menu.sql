@@ -18,7 +18,8 @@ USING (VALUES
     (@ParentId, N'FlaskConical', N'/stock-management?tab=chemical', N'Chemical Stock', 1),
     (@ParentId, N'Beaker', N'/stock-management?tab=mixture', N'Mixture Stock', 2),
     (@ParentId, N'ScrollText', N'/stock-management?tab=fabric', N'Fabric Stock', 3),
-    (@ParentId, N'Layers3', N'/stock-management?tab=pvc', N'PVC Stock', 4)
+    (@ParentId, N'Layers3', N'/stock-management?tab=pvc', N'PVC Stock', 4),
+    (@ParentId, N'PackageCheck', N'/stock-management?tab=finished', N'Finished Goods Stock', 5)
 ) AS source (parent_id, icon, path_name, title, sequence)
 ON target.parent_id = source.parent_id AND target.title = source.title
 WHEN MATCHED THEN UPDATE SET

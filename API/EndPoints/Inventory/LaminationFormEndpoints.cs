@@ -35,5 +35,18 @@ public static class LaminationFormEndpoints
                 return Results.Problem(detail);
             }
         });
+
+        group.MapPut("/{id:int}", async (int id, LaminationFormDto dto, ILaminationFormService service) =>
+        {
+            try
+            {
+                var updated = await service.UpdateAsync(id, dto);
+                return updated is null ? Results.NotFound() : Results.Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(ex.InnerException?.Message ?? ex.Message);
+            }
+        });
     }
 }

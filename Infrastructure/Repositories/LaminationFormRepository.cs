@@ -20,6 +20,8 @@ public class LaminationFormRepository(AppDbContext _context) : ILaminationFormRe
             .Include(x => x.FinalProduct)
             .Include(x => x.ClothRollingForm)
             .Include(x => x.PVC)
+            .Include(x => x.PVCInward)
+            .Include(x => x.MixtureFormulaMaster).ThenInclude(x => x!.FinalProduct)
             .Include(x => x.Chemical)
             .Include(x => x.Worker)
             .Select(x => new LaminationForm
@@ -29,8 +31,12 @@ public class LaminationFormRepository(AppDbContext _context) : ILaminationFormRe
                 ClothRollingFormId = x.ClothRollingFormId,
                 ClothRollBatchNo = x.ClothRollBatchNo,
                 PVCMasterId = x.PVCMasterId,
+                PVCInwardId = x.PVCInwardId,
                 PVCBatchNo = x.PVCBatchNo,
                 PVCQty = x.PVCQty,
+                MixtureFormulaMasterId = x.MixtureFormulaMasterId,
+                MixtureQty = x.MixtureQty,
+                FinalProductQtyMtr = x.FinalProductQtyMtr,
                 ChemicalId = x.ChemicalId,
                 ChemicalQty = x.ChemicalQty,
                 Bounding = x.Bounding,
@@ -50,6 +56,7 @@ public class LaminationFormRepository(AppDbContext _context) : ILaminationFormRe
                     : new ClothRollingForm
                     {
                         Id = x.ClothRollingForm.Id,
+                        RollNo = x.ClothRollingForm.RollNo,
                         BatchNo = x.ClothRollingForm.BatchNo,
                     },
                 PVC = x.PVC == null
@@ -59,6 +66,8 @@ public class LaminationFormRepository(AppDbContext _context) : ILaminationFormRe
                         Id = x.PVC.Id,
                         Name = x.PVC.Name,
                     },
+                PVCInward = x.PVCInward,
+                MixtureFormulaMaster = x.MixtureFormulaMaster,
                 Chemical = x.Chemical == null
                     ? null
                     : new Chemical

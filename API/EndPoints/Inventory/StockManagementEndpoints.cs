@@ -13,6 +13,11 @@ public static class StockManagementEndpoints
 
         group.MapGet("/", async (AppDbContext db) =>
         {
+            // The production database is remote; allow enough time for transient network latency.
+            // Aggregations below are intentionally performed in memory after narrow projections so
+            // SQL Server does not need to compile several GROUP BY queries for one dashboard request.
+            db.Database.SetCommandTimeout(TimeSpan.FromSeconds(120));
+
             var chemicals = await db.Chemical.AsNoTracking()
                 .Where(x => x.IsActive == 1)
                 .OrderBy(x => x.Name)
@@ -35,11 +40,13 @@ public static class StockManagementEndpoints
             var mixtures = await db.MixtureForms.AsNoTracking()
                 .Select(x => new { x.FormulaMasterId, x.TotalMixture })
                 .ToListAsync();
-            var returns = await db.ChemicalStockReturns.AsNoTracking()
+            var returnRows = await db.ChemicalStockReturns.AsNoTracking()
                 .Where(x => x.IsActive == null || x.IsActive == 1)
+                .Select(x => new { x.ChemicalMasterId, x.Qty })
+                .ToListAsync();
+            var returns = returnRows
                 .GroupBy(x => x.ChemicalMasterId)
-                .Select(x => new { ChemicalMasterId = x.Key, Qty = x.Sum(v => v.Qty) })
-                .ToDictionaryAsync(x => x.ChemicalMasterId, x => x.Qty);
+                .ToDictionary(x => x.Key, x => x.Sum(v => v.Qty));
 
             var formulaTotals = formulaChemicals
                 .GroupBy(x => x.FormulaMasterId)
@@ -57,6 +64,13 @@ public static class StockManagementEndpoints
                     used[chemical.ChemicalMasterId] = used.GetValueOrDefault(chemical.ChemicalMasterId) + consumed;
                 }
             }
+
+            var bondingChemicalRows = await db.LaminationForms.AsNoTracking()
+                .Where(x => x.ChemicalId.HasValue && x.ChemicalQty > 0)
+                .Select(x => new { ChemicalId = x.ChemicalId!.Value, x.ChemicalQty })
+                .ToListAsync();
+            foreach (var usage in bondingChemicalRows.GroupBy(x => x.ChemicalId))
+                used[usage.Key] = used.GetValueOrDefault(usage.Key) + (double)usage.Sum(x => x.ChemicalQty);
 
             var chemicalStock = chemicals.Select(chemical =>
             {
@@ -93,6 +107,17 @@ public static class StockManagementEndpoints
                 })
                 .OrderBy(x => x.Name)
                 .ToListAsync();
+            var mixtureUsageRows = await db.LaminationForms.AsNoTracking()
+                .Where(x => x.MixtureFormulaMasterId.HasValue)
+                .Select(x => new { FormulaMasterId = x.MixtureFormulaMasterId!.Value, x.MixtureQty })
+                .ToListAsync();
+            var mixtureUsage = mixtureUsageRows.GroupBy(x => x.FormulaMasterId)
+                .ToDictionary(x => x.Key, x => x.Sum(v => v.MixtureQty));
+            foreach (var item in mixtureStock)
+            {
+                item.Used = (double)mixtureUsage.GetValueOrDefault(item.MasterId);
+                item.Balance = item.Received - item.Used;
+            }
 
             var fabricInwards = await db.FabricInward.AsNoTracking()
                 .Where(x => x.IsActive == null || x.IsActive == 1)
@@ -163,6 +188,34 @@ public static class StockManagementEndpoints
                     Received = x.Sum(v => v.Qty_kg),
                     Balance = x.Sum(v => v.Qty_kg)
                 }).OrderBy(x => x.Name).ToListAsync();
+            var pvcUsageRows = await db.LaminationForms.AsNoTracking()
+                .Where(x => x.PVCMasterId.HasValue)
+                .Select(x => new { PVCMasterId = x.PVCMasterId!.Value, x.PVCQty })
+                .ToListAsync();
+            var pvcUsage = pvcUsageRows.GroupBy(x => x.PVCMasterId)
+                .ToDictionary(x => x.Key, x => x.Sum(v => v.PVCQty));
+            foreach (var item in pvcStock)
+            {
+                item.Used = (double)pvcUsage.GetValueOrDefault(item.MasterId);
+                item.Balance = item.Received - item.Used;
+            }
+
+            var finishedGoodsStock = await db.LaminationForms.AsNoTracking()
+                .GroupBy(x => new
+                {
+                    x.FinalProductId,
+                    Name = x.FinalProduct != null ? x.FinalProduct.Final_Product : string.Empty
+                })
+                .Select(x => new RawMaterialStockDto
+                {
+                    MasterId = x.Key.FinalProductId,
+                    Name = x.Key.Name,
+                    Unit = "MTR",
+                    Received = x.Sum(v => (double)v.FinalProductQtyMtr),
+                    Balance = x.Sum(v => (double)v.FinalProductQtyMtr)
+                })
+                .OrderBy(x => x.Name)
+                .ToListAsync();
 
             return Results.Ok(new StockManagementDto
             {
@@ -170,6 +223,7 @@ public static class StockManagementEndpoints
                 Mixtures = mixtureStock,
                 Fabrics = fabricStock,
                 PVC = pvcStock
+                ,FinishedGoods = finishedGoodsStock
             });
         });
 

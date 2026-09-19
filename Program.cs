@@ -180,6 +180,7 @@ using (var scope = app.Services.CreateScope())
         "reset_cloth_rolling_data_once.sql",
         "reset_chemical_formulas_once.sql",
         "alter_m_laminationform_add_clothrollingform_id.sql",
+        "alter_m_laminationform_process_fields.sql",
         "alter_m_formula_master_add_mixture_name.sql",
         "alter_m_formula_chemical_transaction_add_mixture_name.sql",
         "alter_m_mixtureform_add_mixture_name.sql",
