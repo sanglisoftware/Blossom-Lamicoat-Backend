@@ -173,6 +173,8 @@ using (var scope = app.Services.CreateScope())
         "create_m_mixtureform.sql",
         "create_m_inspectionform.sql",
         "alter_m_inspectionform_drop_inspectorname_rollno.sql",
+        "alter_m_inspectionform_roll_process.sql",
+        "seed_inspection_grades.sql",
         "create_m_laminationform.sql",
         "create_m_clothrollingform.sql",
         "alter_m_clothrollingform_add_stock_fields.sql",

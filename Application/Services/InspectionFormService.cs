@@ -61,11 +61,10 @@ public class InspectionFormService(
 
     public async Task<InspectionFormDto> CreateAsync(InspectionFormDto dto)
     {
-        var fabricProduct = await _context.FproductList.FirstOrDefaultAsync(x => x.Id == dto.ManufacturedFabricProductId);
-        if (fabricProduct == null)
-        {
-            throw new ArgumentException("Manufactured fabric product not found");
-        }
+        if (!dto.LaminationFormId.HasValue) throw new ArgumentException("Select a lamination final product");
+        var lamination = await _context.LaminationForms.FirstOrDefaultAsync(x => x.Id == dto.LaminationFormId.Value)
+            ?? throw new ArgumentException("Lamination final product not found");
+        if (dto.Mtr <= 0) throw new ArgumentException("Roll MTR must be greater than zero");
 
         var grade = await _context.Grade.FirstOrDefaultAsync(x => x.Id == dto.GradeId);
         if (grade == null)
@@ -74,6 +73,23 @@ public class InspectionFormService(
         }
 
         var inspectionForm = _mapper.Map<InspectionForm>(dto);
+        var inspectedMtr = await _context.InspectionForms
+            .Where(x => x.LaminationFormId == lamination.Id)
+            .SumAsync(x => x.Mtr);
+        if (inspectedMtr + dto.Mtr > lamination.FinalProductQtyMtr)
+            throw new ArgumentException($"Only {lamination.FinalProductQtyMtr - inspectedMtr:0.##} MTR is available for inspection");
+
+        var nextSequence = (await _context.InspectionForms.MaxAsync(x => (int?)x.Id) ?? 0) + 1;
+        inspectionForm.ManufacturedFabricProductId = null;
+        inspectionForm.FinalProductId = lamination.FinalProductId;
+        inspectionForm.RollNo = $"IR-{DateTime.Now:ddMMyyyy}-{nextSequence:D5}";
+        inspectionForm.RollType = dto.RollType?.Trim().ToLowerInvariant() switch
+        {
+            "bit" => "Bit",
+            "cut piece" => "Cut Piece",
+            _ => "Roll"
+        };
+        inspectionForm.WastageMtr = 0;
         inspectionForm.CreatedDate = dto.CreatedDate ?? DateTime.UtcNow;
 
         await _repository.AddAsync(inspectionForm);
@@ -88,11 +104,17 @@ public class InspectionFormService(
         {
             Id = inspectionForm.Id,
             ManufacturedFabricProductId = inspectionForm.ManufacturedFabricProductId,
+            LaminationFormId = inspectionForm.LaminationFormId,
+            FinalProductId = inspectionForm.FinalProductId,
+            RollNo = inspectionForm.RollNo,
+            RollType = inspectionForm.RollType,
             GradeId = inspectionForm.GradeId,
             Mtr = inspectionForm.Mtr,
             WastageMtr = inspectionForm.WastageMtr,
             CreatedDate = inspectionForm.CreatedDate,
             ManufacturedFabricProductName = inspectionForm.ManufacturedFabricProduct?.Name ?? string.Empty,
             GradeName = inspectionForm.Grade?.Name ?? string.Empty,
+            FinalProductName = inspectionForm.FinalProduct?.Final_Product ?? string.Empty,
+            LaminationQtyMtr = inspectionForm.LaminationForm?.FinalProductQtyMtr ?? 0,
         };
 }

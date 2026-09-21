@@ -1,5 +1,7 @@
 using Api.Application.DTOs;
 using Api.Application.Interfaces;
+using Api.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.API.EndPoints.Inventory;
 
@@ -14,6 +16,24 @@ public static class InspectionFormEndpoints
             var query = RegexParseFilterSort.BindPagedQueryDto(req.Query);
             var paged = await service.GetAllAsync(query);
             return Results.Ok(paged);
+        });
+
+        group.MapGet("/available-lamination", async (AppDbContext db) =>
+        {
+            var laminations = await db.LaminationForms.AsNoTracking()
+                .Select(x => new
+                {
+                    x.Id,
+                    x.FinalProductId,
+                    FinalProductName = x.FinalProduct != null ? x.FinalProduct.Final_Product : string.Empty,
+                    x.FinalProductQtyMtr,
+                    CreatedDate = x.CreatedDate,
+                    InspectedMtr = db.InspectionForms.Where(i => i.LaminationFormId == x.Id).Sum(i => (decimal?)i.Mtr) ?? 0
+                })
+                .ToListAsync();
+            return Results.Ok(laminations.Where(x => x.FinalProductQtyMtr > x.InspectedMtr)
+                .Select(x => new { x.Id, x.FinalProductId, x.FinalProductName, x.FinalProductQtyMtr, x.InspectedMtr, BalanceMtr = x.FinalProductQtyMtr - x.InspectedMtr, x.CreatedDate })
+                .OrderByDescending(x => x.Id));
         });
 
         group.MapGet("/{id:int}", async (int id, IInspectionFormService service) =>

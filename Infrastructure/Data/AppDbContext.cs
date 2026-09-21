@@ -720,10 +720,16 @@ namespace Api.Infrastructure.Data
 
                 entity.Property(e => e.Id).HasColumnName("id").UseIdentityColumn();
                 entity.Property(e => e.ManufacturedFabricProductId).HasColumnName("manufactured_fabric_product_id");
+                entity.Property(e => e.LaminationFormId).HasColumnName("lamination_form_id");
+                entity.Property(e => e.FinalProductId).HasColumnName("final_product_id");
+                entity.Property(e => e.RollNo).HasColumnName("roll_no").HasMaxLength(100);
+                entity.Property(e => e.RollType).HasColumnName("roll_type");
                 entity.Property(e => e.GradeId).HasColumnName("grade_id");
-                entity.Property(e => e.Mtr).HasColumnName("mtr");
-                entity.Property(e => e.WastageMtr).HasColumnName("wastage_mtr");
+                entity.Property(e => e.Mtr).HasColumnName("mtr").HasPrecision(18, 2);
+                entity.Property(e => e.WastageMtr).HasColumnName("wastage_mtr").HasPrecision(18, 2);
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity.HasIndex(e => e.RollNo).IsUnique().HasFilter("[roll_no] IS NOT NULL");
 
                 entity
                     .HasOne(e => e.ManufacturedFabricProduct)
@@ -736,6 +742,13 @@ namespace Api.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(e => e.GradeId)
                     .HasConstraintName("FK_m_inspectionform_m_grade");
+
+                entity.HasOne(e => e.LaminationForm).WithMany()
+                    .HasForeignKey(e => e.LaminationFormId)
+                    .HasConstraintName("FK_m_inspectionform_m_laminationform");
+                entity.HasOne(e => e.FinalProduct).WithMany()
+                    .HasForeignKey(e => e.FinalProductId)
+                    .HasConstraintName("FK_m_inspectionform_m_final_product");
             });
 
             modelBuilder.Entity<LaminationForm>(entity =>

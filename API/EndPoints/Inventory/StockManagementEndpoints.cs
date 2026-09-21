@@ -217,13 +217,50 @@ public static class StockManagementEndpoints
                 .OrderBy(x => x.Name)
                 .ToListAsync();
 
+            var inspectedRollRows = await db.InspectionForms.AsNoTracking()
+                .Where(x => x.FinalProductId.HasValue)
+                .Select(x => new
+                {
+                    FinalProductId = x.FinalProductId!.Value,
+                    ProductName = x.FinalProduct != null ? x.FinalProduct.Final_Product : string.Empty,
+                    GradeName = x.Grade != null ? x.Grade.Name : string.Empty,
+                    x.Mtr
+                })
+                .ToListAsync();
+
+            var inspectedByProduct = inspectedRollRows
+                .GroupBy(x => x.FinalProductId)
+                .ToDictionary(x => x.Key, x => x.Sum(v => (double)v.Mtr));
+            foreach (var item in finishedGoodsStock)
+            {
+                item.Used = inspectedByProduct.GetValueOrDefault(item.MasterId);
+                item.Balance = item.Received - item.Used;
+            }
+
+            var finishedRollStock = inspectedRollRows
+                .GroupBy(x => new { x.FinalProductId, x.ProductName, x.GradeName })
+                .Select(x => new RawMaterialStockDto
+                {
+                    MasterId = x.Key.FinalProductId,
+                    Name = x.Key.ProductName,
+                    Grade = x.Key.GradeName,
+                    Unit = "MTR",
+                    RollCount = x.Count(),
+                    Received = x.Sum(v => (double)v.Mtr),
+                    Balance = x.Sum(v => (double)v.Mtr)
+                })
+                .OrderBy(x => x.Name)
+                .ThenBy(x => x.Grade)
+                .ToList();
+
             return Results.Ok(new StockManagementDto
             {
                 Chemicals = chemicalStock,
                 Mixtures = mixtureStock,
                 Fabrics = fabricStock,
-                PVC = pvcStock
-                ,FinishedGoods = finishedGoodsStock
+                PVC = pvcStock,
+                FinishedGoods = finishedGoodsStock,
+                FinishedRolls = finishedRollStock
             });
         });
 

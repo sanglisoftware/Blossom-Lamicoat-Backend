@@ -18,6 +18,8 @@ public class RawMaterialStockDto
     public string Unit { get; set; } = string.Empty;
     public string Gramage { get; set; } = string.Empty;
     public string Colour { get; set; } = string.Empty;
+    public string Grade { get; set; } = string.Empty;
+    public int RollCount { get; set; }
     public double Received { get; set; }
     public double Used { get; set; }
     public double Returned { get; set; }
@@ -34,6 +36,7 @@ public class StockManagementDto
     public List<RawMaterialStockDto> Fabrics { get; set; } = [];
     public List<RawMaterialStockDto> PVC { get; set; } = [];
     public List<RawMaterialStockDto> FinishedGoods { get; set; } = [];
+    public List<RawMaterialStockDto> FinishedRolls { get; set; } = [];
 }
 
 public class CreateChemicalStockReturnDto
